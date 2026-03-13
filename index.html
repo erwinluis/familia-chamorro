@@ -1,0 +1,1431 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Genealogía Familia Chamorro</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap');
+
+  :root {
+    --parchment: #f5ead8;
+    --ink: #1a1008;
+    --rust: #8b3a1a;
+    --gold: #b8860b;
+    --brown: #5c3317;
+    --light-brown: #c9a87c;
+    --cream: #fdf6ec;
+    --shadow: rgba(92,51,23,0.18);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'EB Garamond', Georgia, serif;
+    background: var(--parchment);
+    color: var(--ink);
+    min-height: 100vh;
+    background-image:
+      radial-gradient(ellipse at 20% 10%, rgba(184,134,11,0.07) 0%, transparent 60%),
+      radial-gradient(ellipse at 80% 90%, rgba(139,58,26,0.07) 0%, transparent 60%),
+      url("data:image/svg+xml,%3Csvg width='200' height='200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+  }
+
+  header {
+    text-align: center;
+    padding: 3rem 2rem 2rem;
+    border-bottom: 2px solid var(--gold);
+    background: linear-gradient(180deg, rgba(184,134,11,0.1) 0%, transparent 100%);
+  }
+
+  header h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    color: var(--rust);
+    letter-spacing: 0.05em;
+    line-height: 1.2;
+  }
+
+  header .subtitle {
+    font-style: italic;
+    color: var(--brown);
+    margin-top: 0.5rem;
+    font-size: 1.1rem;
+  }
+
+  header .link-note {
+    margin-top: 1rem;
+    font-size: 0.95rem;
+    color: var(--rust);
+    background: rgba(184,134,11,0.12);
+    display: inline-block;
+    padding: 0.4rem 1.2rem;
+    border: 1px solid var(--gold);
+    border-radius: 2px;
+  }
+
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    justify-content: center;
+    padding: 1rem 2rem;
+    background: rgba(255,255,255,0.4);
+    border-bottom: 1px solid var(--light-brown);
+    font-size: 0.85rem;
+  }
+
+  .legend-item { display: flex; align-items: center; gap: 0.4rem; }
+  .legend-dot {
+    width: 14px; height: 14px; border-radius: 50%; flex-shrink: 0;
+    border: 2px solid rgba(0,0,0,0.2);
+  }
+
+  .tree-section {
+    padding: 2rem;
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+
+  .section-header {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.4rem;
+    color: var(--rust);
+    border-bottom: 1px solid var(--light-brown);
+    padding-bottom: 0.5rem;
+    margin: 2rem 0 1.2rem;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+
+  .section-header::before {
+    content: '✦';
+    font-size: 1rem;
+    color: var(--gold);
+  }
+
+  /* Tree node styles */
+  .node {
+    position: relative;
+    margin: 0.15rem 0;
+  }
+
+  .node-content {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    cursor: pointer;
+    padding: 0.25rem 0.6rem;
+    border-radius: 3px;
+    transition: background 0.15s;
+    max-width: 100%;
+  }
+
+  .node-content:hover { background: rgba(184,134,11,0.12); }
+
+  .node-dot {
+    width: 10px; height: 10px; border-radius: 50%;
+    flex-shrink: 0; border: 2px solid rgba(0,0,0,0.15);
+  }
+
+  .node-name {
+    font-size: 0.92rem;
+    line-height: 1.3;
+  }
+
+  .node-name .surname { font-weight: 700; }
+  .node-name .spouse { font-style: italic; color: var(--brown); font-size: 0.85rem; }
+  .node-name .note { font-size: 0.78rem; color: #888; font-style: italic; }
+
+  .toggle-btn {
+    background: none; border: none; cursor: pointer;
+    color: var(--gold); font-size: 0.75rem;
+    padding: 0 0.2rem;
+    line-height: 1;
+    flex-shrink: 0;
+  }
+
+  .children {
+    margin-left: 1.6rem;
+    border-left: 1px dashed var(--light-brown);
+    padding-left: 0.8rem;
+  }
+
+  .children.collapsed { display: none; }
+
+  /* Generation colors */
+  .gen-0 .node-dot { background: #4a1a0a; }
+  .gen-1 .node-dot { background: #7b2d12; }
+  .gen-2 .node-dot { background: var(--rust); }
+  .gen-3 .node-dot { background: #c0642a; }
+  .gen-4 .node-dot { background: var(--gold); }
+  .gen-5 .node-dot { background: #9aaf5a; }
+  .gen-6 .node-dot { background: #5a8a9f; }
+  .gen-7 .node-dot { background: #7f6ca8; }
+
+  .link-node {
+    background: rgba(184,134,11,0.15);
+    border: 1px solid var(--gold);
+    border-radius: 4px;
+    padding: 0.3rem 0.8rem;
+    margin: 0.3rem 0;
+    font-weight: 600;
+    color: var(--rust);
+    font-size: 0.95rem;
+  }
+
+  .link-badge {
+    font-size: 0.7rem;
+    background: var(--rust);
+    color: white;
+    padding: 0.1rem 0.4rem;
+    border-radius: 10px;
+    margin-left: 0.4rem;
+    font-style: normal;
+    vertical-align: middle;
+  }
+
+  .root-card {
+    background: linear-gradient(135deg, rgba(255,255,255,0.7), rgba(245,234,216,0.9));
+    border: 2px solid var(--gold);
+    border-radius: 6px;
+    padding: 1rem 1.5rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 4px 20px var(--shadow);
+  }
+
+  .root-card h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.15rem;
+    color: var(--rust);
+  }
+
+  .root-card p {
+    font-size: 0.88rem;
+    color: var(--brown);
+    margin-top: 0.3rem;
+    font-style: italic;
+  }
+
+  footer {
+    text-align: center;
+    padding: 2rem;
+    border-top: 1px solid var(--light-brown);
+    color: var(--brown);
+    font-size: 0.85rem;
+    font-style: italic;
+  }
+
+  @media (max-width: 600px) {
+    .tree-section { padding: 1rem; }
+    .children { margin-left: 1rem; padding-left: 0.5rem; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Genealogía de la Familia Chamorro</h1>
+  <p class="subtitle">De Sevilla, España — Nicaragua &amp; Guatemala — Siglos XVII–XX</p>
+  <p class="link-note">
+    <strong>Enlace entre documentos:</strong>
+    El archivo nuevo (1009) se conecta al archivo antiguo (1010) a través de
+    <em>Pedro Joaquín Chamorro Alfaro</em> y <em>Fernando Chamorro Alfaro</em>,
+    hijos de <em>Pedro José Chamorro Argüello</em>.
+  </p>
+</header>
+
+<div class="legend">
+  <span style="font-weight:600; color:var(--brown)">Generaciones:</span>
+  <span class="legend-item"><span class="legend-dot" style="background:#4a1a0a"></span>Orig. Sevilla</span>
+  <span class="legend-item"><span class="legend-dot" style="background:#7b2d12"></span>Fundadores</span>
+  <span class="legend-item"><span class="legend-dot" style="background:var(--rust)"></span>3ª Gen.</span>
+  <span class="legend-item"><span class="legend-dot" style="background:#c0642a"></span>4ª Gen.</span>
+  <span class="legend-item"><span class="legend-dot" style="background:var(--gold)"></span>5ª Gen.</span>
+  <span class="legend-item"><span class="legend-dot" style="background:#9aaf5a"></span>6ª Gen.</span>
+  <span class="legend-item"><span class="legend-dot" style="background:#5a8a9f"></span>7ª Gen.</span>
+  <span class="legend-item"><span class="legend-dot" style="background:#7f6ca8"></span>8ª Gen.</span>
+  <span style="margin-left:1rem; font-style:italic; font-size:0.85rem; color:var(--rust)">▶ Haga clic en ▸/▾ para expandir/colapsar ramas</span>
+</div>
+
+<div class="tree-section">
+
+  <div class="section-header">Tronco Común — Familia Chamorro de Sotomayor (Sevilla)</div>
+  <div class="root-card">
+    <h3>I. Don Diego Chamorro <small style="font-weight:400">× Doña Juana Ortiz</small></h3>
+    <p>Natural de Sevilla. Progenitor del linaje. Comprobado con documentos de la Orden Militar de Santiago.</p>
+  </div>
+
+  <div id="tree-root"></div>
+
+  <div class="section-header">Enlace: Rama de Nicaragua — Pedro José Chamorro Argüello</div>
+  <div class="root-card">
+    <h3>Pedro José Chamorro Argüello <small style="font-weight:400">× Josefa Margarita Alfaro y Monterroso</small></h3>
+    <p>Nacido en 1782. Progenitor de los miembros más conocidos de la familia Chamorro en Nicaragua.<br>
+    <strong>Hijos que enlazan ambos documentos:</strong>
+    Rosendo (sin desc.), Carmen (sin desc.),
+    <em>Dionisio Chamorro Alfaro</em> (con descendencia — archivo antiguo),
+    Mercedes (sin desc.),
+    <em>Pedro Joaquín Chamorro Alfaro</em> (con larga desc. — <strong>archivo nuevo</strong>),
+    <em>Fernando Chamorro Alfaro</em> (con larga desc. — <strong>archivo nuevo</strong>)
+    </p>
+  </div>
+
+  <div class="section-header">Rama I — Pedro Joaquín Chamorro Alfaro (Archivo Nuevo, 1009)</div>
+  <div id="tree-pedro"></div>
+
+  <div class="section-header">Rama II — Fernando Chamorro Alfaro (Archivo Nuevo, 1009)</div>
+  <div id="tree-fernando"></div>
+
+  <div class="section-header">Rama III — Dionisio Chamorro Alfaro (Archivo Antiguo, 1010)</div>
+  <div id="tree-dionisio"></div>
+
+  <div class="section-header">Rama — Fruto Chamorro (Archivo Nuevo, 1009)</div>
+  <div id="tree-fruto"></div>
+
+</div>
+
+<footer>
+  Genealogía Familia Chamorro · Fuentes: Documento 1009 (Nuevo) y Documento 1010 (Antiguo) · Compilado con base en ambos archivos
+</footer>
+
+<script>
+const COLORS = ['#4a1a0a','#7b2d12','#8b3a1a','#c0642a','#b8860b','#9aaf5a','#5a8a9f','#7f6ca8'];
+
+function makeNode(name, spouse, note, gen, children) {
+  return { name, spouse, note, gen, children: children || [] };
+}
+
+function renderTree(data, container) {
+  data.forEach(node => {
+    const div = document.createElement('div');
+    div.className = `node gen-${Math.min(node.gen, 7)}`;
+
+    const content = document.createElement('div');
+    content.className = 'node-content';
+
+    const dot = document.createElement('span');
+    dot.className = 'node-dot';
+    dot.style.background = COLORS[Math.min(node.gen, 7)];
+
+    const label = document.createElement('span');
+    label.className = 'node-name';
+
+    let html = `<span class="surname">${node.name}</span>`;
+    if (node.spouse) html += ` <span class="spouse">× ${node.spouse}</span>`;
+    if (node.note) html += ` <span class="note">${node.note}</span>`;
+    label.innerHTML = html;
+
+    content.appendChild(dot);
+    content.appendChild(label);
+
+    let childrenDiv = null;
+    if (node.children && node.children.length > 0) {
+      const btn = document.createElement('button');
+      btn.className = 'toggle-btn';
+      btn.textContent = '▾';
+      content.appendChild(btn);
+
+      childrenDiv = document.createElement('div');
+      childrenDiv.className = 'children';
+      renderTree(node.children, childrenDiv);
+
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        childrenDiv.classList.toggle('collapsed');
+        btn.textContent = childrenDiv.classList.contains('collapsed') ? '▸' : '▾';
+      });
+    }
+
+    div.appendChild(content);
+    if (childrenDiv) div.appendChild(childrenDiv);
+    container.appendChild(div);
+  });
+}
+
+// === TRONCO SEVILLA → NICARAGUA ===
+const rootData = [
+  makeNode('II. Catalina Chamorro de la Cerda', 'Francisco de Sotomayor (Sevilla, 1632)', '', 1, [
+    makeNode('III. Diego Chamorro de Sotomayor', 'Lucrecia García de la Torre y Ponce de León (1689)', 'Bautizado 1646, Sevilla', 2, [
+      makeNode('IV. Pedro Chamorro de Sotomayor', 'María Josefa de Murga y Núñez de Villavicencio', 'Corregidor en Bedmar, Jaén', 3, [
+        makeNode('1. Lucrecia Chamorro de Sotomayor y Murga', null, 'Religiosa, Convento de Santa Clara, Sevilla', 4),
+        makeNode('2. Diego Chamorro de Sotomayor y Murga', null, 'Emigró a Nicaragua — Sargento Mayor. 20 hijos de 4 matrimonios', 4, [
+          makeNode('PRIMERAS NUPCIAS: Gregoria Lacayo de Briones y Pomar', null, '', 5, [
+            makeNode('Pedro José Chamorro y Lacayo', null, 'Sacerdote, Deán Catedral de León', 6),
+            makeNode('Juan Antonio Chamorro y Lacayo', null, 'Sacerdote', 6),
+            makeNode('Miguel Chamorro y Lacayo', null, 'Teniente de Cura', 6),
+            makeNode('Fray Diego Chamorro y Lacayo', null, 'Mercedario', 6),
+            makeNode('Fray José Antonio Chamorro y Lacayo', null, 'Recoleto', 6),
+            makeNode('Fernando Chamorro y Lacayo de Briones', 'Bárbara Nicolasa Argüello del Castillo y Guzmán (1776)', 'Clave: continuó la línea', 6, [
+              makeNode('A. Francisco Matías Chamorro Argüello', 'Josefina Bermúdez', 'Nac. 24-Feb-1781, Granada', 7, [
+                makeNode('Jacinto Chamorro Bermúdez', null, '', 8),
+                makeNode('Dolores Chamorro Bermúdez', null, '', 8),
+                makeNode('Narciso Chamorro Bermúdez', null, '', 8),
+                makeNode('Fernando Chamorro Bermúdez', null, '', 8),
+                makeNode('Rosario Chamorro Bermúdez', null, 'Rama trasladada a Rivas y Costa Rica', 8),
+              ]),
+              makeNode('B. Pedro José Chamorro Argüello', 'Josefa Margarita Alfaro y Monterroso', 'Nac. 1782 — ENLACE PRINCIPAL', 7, [
+                makeNode('a) Rosendo Chamorro Alfaro', null, 'Soltero, sin descendencia', 8),
+                makeNode('b) Carmen Chamorro Alfaro', null, 'Soltera, sin descendencia', 8),
+                makeNode('c) Dionisio Chamorro Alfaro', null, 'Con descendencia → Rama III (archivo antiguo)', 8),
+                makeNode('d) Mercedes Chamorro Alfaro', null, 'Soltera, sin descendencia', 8),
+                makeNode('e) Pedro Joaquín Chamorro Alfaro', null, '→ Rama I (archivo nuevo)', 8),
+                makeNode('f) Fernando Chamorro Alfaro', null, '→ Rama II (archivo nuevo)', 8),
+                makeNode('u) Fruto Chamorro Pérez', null, 'Hijo reconocido, con descendencia', 8),
+              ]),
+              makeNode('C. María Mercedes Chamorro Argüello', null, 'Soltera, sin descendencia', 7),
+            ]),
+            makeNode('Manuela Chamorro y Lacayo', null, 'Sin datos de descendencia', 6),
+            makeNode('Gregoria Josefa Chamorro y Lacayo', 'Francisco Martínez Capriles', '', 6),
+            makeNode('Dionisio Chamorro y Lacayo', null, 'Clérigo Presbítero, sin desc.', 6),
+            makeNode('Fray Manuel Chamorro y Lacayo', null, 'Recoleto, sin desc.', 6),
+          ]),
+          makeNode('SEGUNDAS NUPCIAS: Doña Inez de Villanueva', null, '', 5, [
+            makeNode('María Josefa Chamorro y Villanueva', null, '', 6),
+            makeNode('Simona Chamorro y Villanueva', null, '', 6),
+            makeNode('Diego Manuel Chamorro y Villanueva', null, '', 6),
+            makeNode('Andrea Chamorro y Villanueva', 'José Antonio Guerrero (factor)', '', 6),
+            makeNode('María Josefa Chamorro y Villanueva (2ª)', null, '', 6),
+          ]),
+          makeNode('TERCERAS NUPCIAS: Doña Juana Fajardo', null, '', 5, [
+            makeNode('José Antonio Chamorro y Fajardo', null, 'Sacerdote', 6),
+            makeNode('Francisco Chamorro y Fajardo', 'Marcelina Martínez Montaña', '', 6),
+            makeNode('Joaquín Chamorro y Fajardo', 'Josefina Sacasa y Marenco', '', 6),
+          ]),
+          makeNode('CUARTAS NUPCIAS: Doña Rafaela Oconor y Salafranca', null, '', 5, [
+            makeNode('María Gertrudis Chamorro y Oconor', null, '', 6),
+            makeNode('María Josefa Chamorro y Oconor', null, 'Casada 2 veces; primera con Francisco de la Vega', 6),
+          ]),
+        ]),
+        makeNode('3. María Manuela Chamorro de Sotomayor y Murga', null, 'Permaneció en Sevilla', 4),
+        makeNode('4. Inés Chamorro de Sotomayor y Murga', null, 'Permaneció en Sevilla', 4),
+        makeNode('5. Francisca Chamorro de Sotomayor y Murga', 'Luis Pedro de Aguirre de Ayzpeegoena (Sevilla, 1745)', '', 4, [
+          makeNode('Tte. Cnel. Francisco Javier de Aguirre y Chamorro', 'Ana Cristina Larios de Miranda y Jiménez (Sevilla, 1773)', 'Nac. Bedmar, 21-Jul-1746. Pasaron a Guatemala', 5),
+        ]),
+        makeNode('6. Francisco Ignacio Chamorro de Sotomayor y Murga', null, 'Nac. 23-Ene-1719 Sevilla → Emigró a Guatemala (Rama Guatemala)', 4),
+        makeNode('7. Ana Chamorro de Sotomayor y Murga', null, '', 4),
+        makeNode('8. Domingo Chamorro de Sotomayor y Murga', null, '', 4),
+        makeNode('9. Clara Chamorro de Sotomayor y Murga', null, '', 4),
+      ])
+    ])
+  ])
+];
+
+// === RAMA I: PEDRO JOAQUÍN CHAMORRO ALFARO ===
+const pedroData = [
+  makeNode('Pedro Joaquín Chamorro Alfaro', 'Luz Bolaños Bendaña', 'Hija de Pío José Bolaños y Pastora Bendaña', 2, [
+    makeNode('I. Fruto Chamorro Bolaños', 'Bernabela Iribarren', 'Sin sucesión', 3),
+    makeNode('II. Pedro José Chamorro Bolaños', 'Dominga Zelaya de Bolaños', '', 3, [
+      makeNode('1. Josefa Margarita Chamorro Zelaya', 'Emilio Álvarez Lejarza', '', 4, [
+        makeNode('A. Esperanza Álvarez Chamorro', 'Jerry Peterka', '', 5, [
+          makeNode('a) James Peterka Álvarez', null, '', 6),
+          makeNode('b) Mark Peterka Álvarez', null, '', 6),
+        ]),
+        makeNode('B. Julio Álvarez Chamorro', 'Melba Cabrera', '', 5, [
+          makeNode('a) Melba Esperanza Álvarez Cabrera', null, '', 6),
+          makeNode('b) Julio Álvarez Cabrera', null, '', 6),
+          makeNode('c) Cynthia Margarita Álvarez Cabrera', null, '', 6),
+        ]),
+        makeNode('C. Bertha Álvarez Chamorro', 'José Armstrong', '', 5, [
+          makeNode('a) Andrew Armstrong Álvarez', null, '', 6),
+          makeNode('b) Carmen Dolores Armstrong Álvarez', null, '', 6),
+          makeNode('c) Cecilia Luisa Armstrong Álvarez', null, '', 6),
+        ]),
+        makeNode('D. Margarita Álvarez Chamorro', 'Rafael Córdova Rivas', '', 5, [
+          makeNode('a) Margarita Córdova Álvarez', null, '', 6),
+          makeNode('b) Carmen Dolores Córdova Álvarez', null, '', 6),
+          makeNode('c) Lucía Verónica Córdova Álvarez', null, '', 6),
+          makeNode('d) Cristián Córdova Álvarez', null, '', 6),
+          makeNode('e) José Gustavo Córdova Álvarez', null, '', 6),
+          makeNode('f) Rafael Emilio Córdova Álvarez', null, '', 6),
+          makeNode('g) María José Córdova Álvarez', null, '', 6),
+          makeNode('h) Héctor Córdova Álvarez', null, '', 6),
+          makeNode('i) Katya Córdova Álvarez', null, '', 6),
+        ]),
+        makeNode('F. Pedro José Álvarez Chamorro', 'Celia Alvarado', '', 5, [
+          makeNode('a) Pedro José Álvarez Alvarado', null, '', 6),
+          makeNode('b) Enrique Álvarez Alvarado', null, '', 6),
+          makeNode('c) Lila Margarita Álvarez Alvarado', null, '', 6),
+          makeNode('d) Eduardo Álvarez Alvarado', null, '', 6),
+        ]),
+        makeNode('F. Carmen María Álvarez Chamorro', 'Óscar Rodríguez', '', 5, [
+          makeNode('1) Óscar Rodríguez Álvarez', null, '', 6),
+          makeNode('2) Carmen Adriana Rodríguez Álvarez', null, '', 6),
+        ]),
+      ]),
+      makeNode('2. Leandro Chamorro Zelaya', 'Cecilia Barillas Ximénez', '', 4, [
+        makeNode('A. Celia Chamorro Barillas (Gemela)', 'Julián Alfaro', '', 5, [
+          makeNode('1) María Cecilia Alfaro Chamorro', null, '', 6),
+        ]),
+        makeNode('B. Margarita Chamorro Barillas (Gemela)', 'Julio Vivas Benard', '', 5, [
+          makeNode('a) Cecilia Angélica Vivas Chamorro', null, '', 6),
+          makeNode('b) Adolfo Vivas Chamorro', null, '', 6),
+          makeNode('c) Rodrigo Vivas Chamorro', null, '', 6),
+          makeNode('d) Eduardo Vivas Chamorro', null, '', 6),
+          makeNode('e) Pablo Alejandro Vivas Chamorro', null, '', 6),
+        ]),
+        makeNode('C. Adolfo Chamorro Barillas (1ras Nupcias)', 'Lourdes César Chamorro', '', 5, [
+          makeNode('a) Leandro Chamorro César', null, '', 6),
+          makeNode('b) María Angélica Chamorro César', null, '', 6),
+          makeNode('c) María Lourdes Chamorro César', null, '', 6),
+          makeNode('d) Adolfo Chamorro César', null, '', 6),
+          makeNode('e) Pacelli Chamorro César', null, '', 6),
+          makeNode('f) Cecilia Chamorro César', null, '', 6),
+          makeNode('g) Guillermo César', null, '', 6),
+        ]),
+        makeNode('D. Julia Chamorro Barillas', 'Alejandro Hurtado Chamorro', '', 5, [
+          makeNode('a) Alfonso Hurtado Chamorro', null, '', 6),
+          makeNode('b) Alfredo Hurtado Chamorro', null, '', 6),
+          makeNode('c) Alejandro Hurtado Chamorro', null, '', 6),
+        ]),
+        makeNode('E. Gloria Chamorro Barillas', 'José Dionisio Chamorro Wolf', '', 5, [
+          makeNode('a) José Dionisio Chamorro Chamorro', null, '', 6),
+          makeNode('b) Carlos Chamorro Chamorro', null, '', 6),
+          makeNode('c) Mauricio Chamorro Chamorro', null, '', 6),
+          makeNode('d) Ana Dennise Chamorro Chamorro', null, '', 6),
+        ]),
+        makeNode('F. Marina Chamorro Barillas', 'Roberto Chamorro Zinc', '', 5, [
+          makeNode('a) Claudia Chamorro Chamorro', null, '', 6),
+          makeNode('b) Roberto Chamorro Chamorro', null, '', 6),
+          makeNode('c) Violeta Chamorro Chamorro', null, '', 6),
+          makeNode('d) Alberto Chamorro Chamorro', null, '', 6),
+          makeNode('e) Clarence Chamorro Chamorro', null, '', 6),
+          makeNode('f) Marcelo Chamorro Chamorro', null, '', 6),
+        ]),
+        makeNode('G. Berta Chamorro Barillas', 'Silvio Cuadra Sáenz', '', 5, [
+          makeNode('a) Silvio Horacio Cuadra Chamorro', null, '', 6),
+          makeNode('b) Álvaro Cuadra Chamorro', null, '', 6),
+          makeNode('c) Cecilia Cuadra Chamorro', null, '', 6),
+          makeNode('d) José Cuadra Chamorro', null, '', 6),
+          makeNode('e) Patricia Cuadra Chamorro', null, '', 6),
+          makeNode('f) Rodrigo Cuadra Chamorro', null, '', 6),
+          makeNode('g) Marcelo Cuadra Chamorro', null, '', 6),
+          makeNode('h) Berta Cuadra Chamorro', null, '', 6),
+          makeNode('i) María Lourdes Cuadra Chamorro', null, '', 6),
+        ]),
+      ]),
+      makeNode('3. Berta Chamorro Zelaya', 'César Mejía Morales', '', 4, [
+        makeNode('A. Clementina Mejía Chamorro', 'Henry Goodman Arana', '', 5, [
+          makeNode('a) Larry Goodman Mejía', null, '', 6),
+          makeNode('b) Berta Claudia Goodman Mejía', null, '', 6),
+          makeNode('c) Silvia Isabel Goodman Mejía', null, '', 6),
+          makeNode('d) Rosalina Goodman Mejía', null, '', 6),
+        ]),
+        makeNode('B. Luis Mejía Chamorro (1ras Nupcias)', 'Ana Martínez', 'Sin sucesión', 5),
+        makeNode('B. Luis Mejía Chamorro (2das Nupcias)', 'Ana Olga Cuadra García', '', 5, [
+          makeNode('a) Luis Errol Mejía Cuadra', null, '', 6),
+          makeNode('b) César Eulogio Mejía Cuadra', null, '', 6),
+          makeNode('c) Pedro José Mejía Cuadra', null, '', 6),
+          makeNode('d) Martín Gonzalo Mejía Cuadra', null, '', 6),
+          makeNode('e) Berta Natalia Mejía Cuadra', null, '', 6),
+        ]),
+        makeNode('C. Teresa Mejía Chamorro', 'José Cuadra Sáenz', '', 5, [
+          makeNode('a) Berta Margarita Cuadra Mejía', null, '', 6),
+          makeNode('b) Lucía Cuadra Mejía', null, '', 6),
+          makeNode('c) José Luis Cuadra Mejía', null, '', 6),
+          makeNode('d) César Javier Cuadra Mejía', null, '', 6),
+        ]),
+      ]),
+      makeNode('4. Cecilia Chamorro Zelaya', 'Fernando Solórzano Montealegre', '', 4, [
+        makeNode('A. Fernando José Solórzano Chamorro', 'Ana María Gil', '', 5, [
+          makeNode('1) Rosanna Solórzano Gil', null, '', 6),
+          makeNode('2) María de Lourdes Solórzano Gil', null, '', 6),
+        ]),
+        makeNode('B. Gloria Solórzano Chamorro', null, 'Soltera', 5),
+        makeNode('C. Pedro José Solórzano Chamorro', 'Adela Castillo Martínez', '', 5, [
+          makeNode('a) Federico Solórzano Castillo', null, '', 6),
+          makeNode('b) Pedro José Solórzano Castillo', null, '', 6),
+          makeNode('c) Rita Eugenia Solórzano Castillo', null, '', 6),
+          makeNode('d) Adela María Solórzano', null, '', 6),
+          makeNode('e) Juan Fernando Solórzano Castillo', null, '', 6),
+          makeNode('f) Mariano Solórzano Castillo', null, '', 6),
+        ]),
+        makeNode('D. Emilia Solórzano Chamorro', 'Dayton Caldera Lacayo', '', 5, [
+          makeNode('a) Ana Cecilia Caldera Solórzano', null, '', 6),
+          makeNode('b) Dayton Martín Caldera', null, '', 6),
+          makeNode('c) María Lucía Caldera Solórzano', null, '', 6),
+          makeNode('d) Emilia Margarita Caldera Solórzano', null, '', 6),
+          makeNode('e) Rodrigo Bosco Caldera Solórzano', null, '', 6),
+          makeNode('f) Eugenia Caldera Solórzano', null, '', 6),
+        ]),
+        makeNode('E. Cecilia Solórzano Chamorro', 'Emilio Chamorro Pasos', '', 5, [
+          makeNode('a) María Cecilia Chamorro Solórzano', null, '', 6),
+          makeNode('b) Emilio José Chamorro Solórzano', null, '', 6),
+          makeNode('c) María Gabriela Chamorro Solórzano', null, '', 6),
+        ]),
+      ]),
+      makeNode('5. María Luisa Chamorro Zelaya', 'Julio Cardenal Argüello (2das Nupcias)', '', 4, [
+        makeNode('A. Roberto Belarmino Cardenal Chamorro', null, 'Religioso', 5),
+        makeNode('B. Mireya Cardenal Chamorro', 'Ronald Abaunza Cabezas', '', 5, [
+          makeNode('a) Lydia Cecilia Abaunza Cardenal', null, '', 6),
+          makeNode('b) Mireya Eugenia Abaunza Cardenal', null, '', 6),
+          makeNode('c) Ronald Bosco Abaunza Cardenal', null, '', 6),
+          makeNode('d) Eduardo Martín Abaunza Cardenal', null, '', 6),
+        ]),
+        makeNode('C. Enrique Cardenal Chamorro', 'Marta Rosa Gurdián', '', 5, [
+          makeNode('a) María Luisa Cardenal Gurdián', null, '', 6),
+          makeNode('b) Ana Clemencia Cardenal Gurdián', null, '', 6),
+          makeNode('c) Roberto Belarmino Cardenal Gurdián', null, '', 6),
+          makeNode('d) Enrique José Cardenal Gurdián', null, '', 6),
+          makeNode('e) María Josefina Cardenal Gurdián', null, '', 6),
+          makeNode('f) Claudia María Cardenal Gurdián', null, '', 6),
+        ]),
+        makeNode('D. Teresita Cardenal Chamorro', 'César Delgadillo Machado', '', 5, [
+          makeNode('a) Luisa Teresa Delgadillo Cardenal', null, '', 6),
+          makeNode('b) Nela María Cardenal Cardenal', null, '', 6),
+          makeNode('c) César Antonio Cardenal Cardenal', null, '', 6),
+          makeNode('d) Julio Eduardo Delgadillo Cardenal', null, '', 6),
+          makeNode('e) Rosanna Delgadillo Cardenal', null, '', 6),
+          makeNode('f) Álvaro Delgadillo Cardenal', null, '', 6),
+        ]),
+        makeNode('E. Ramiro Cardenal Chamorro', 'María Mercedes Lacayo', '', 5, [
+          makeNode('a) Elisa Mercedes Cardenal Lacayo', null, '', 6),
+          makeNode('b) Manuel Ignacio Cardenal Lacayo', null, '', 6),
+          makeNode('c) María Fernanda Cardenal Chamorro Lacayo', null, '', 6),
+        ]),
+      ]),
+      makeNode('6. Pedro José Chamorro Zelaya', 'Carmen Poessy Montiel', '', 4, [
+        makeNode('A. Argentina Chamorro Poessy', 'Ricardo Descanio', '', 5, [
+          makeNode('a) Ana Teresa Descanio Chamorro', null, '', 6),
+          makeNode('b) Ricardo Ariel Descanio Chamorro', null, '', 6),
+          makeNode('c) Carlos José Descanio Chamorro', null, '', 6),
+        ]),
+        makeNode('B. Pedro José Chamorro Poessy', 'Gioconda Argüello', '', 5, [
+          makeNode('a) Pedro José Chamorro Argüello', null, '', 6),
+          makeNode('b) Víctor Chamorro Argüello', null, '', 6),
+          makeNode('c) Guillermo Chamorro Argüello', null, '', 6),
+        ]),
+      ]),
+      makeNode('7. Víctor Manuel Chamorro Zelaya', null, 'Sin datos', 4),
+    ]),
+    makeNode('III. Pedro Joaquín Chamorro Bolaños', 'Ana María Zelaya Bolaños', '', 3, [
+      makeNode('Pedro Joaquín Chamorro Zelaya', 'Margarita Cardenal', '', 4, [
+        makeNode('A. Pedro Joaquín Chamorro Cardenal', 'Violeta Barrios Torres', '', 5, [
+          makeNode('a) Pedro Joaquín Chamorro Barrios', null, '', 6),
+          makeNode('b) Claudia Lucía Chamorro Barrios', null, '', 6),
+          makeNode('c) Cristina Chamorro Barrios', null, '', 6),
+          makeNode('d) Carlos Fernando Chamorro Barrios', null, '', 6),
+        ]),
+        makeNode('B. Ana María Chamorro Cardenal', 'Carlos Holmann Thompson', '', 5, [
+          makeNode('a) Eduardo Holmann Chamorro', null, '', 6),
+          makeNode('b) Verónica Holmann Chamorro', null, '', 6),
+          makeNode('c) Hugo Martín Holmann Chamorro', null, '', 6),
+          makeNode('d) Ana Carolina Holmann Chamorro', null, '', 6),
+          makeNode('e) Bruno Holmann Chamorro', null, '', 6),
+          makeNode('f) Erika Holmann Chamorro', null, '', 6),
+          makeNode('g) Juan Lorenzo Holmann Chamorro', null, '', 6),
+        ]),
+        makeNode('C. Ligia Chamorro Cardenal', 'Samuel Barreto Argüello', '', 5, [
+          makeNode('a) Ximena Barreto Chamorro', null, '', 6),
+          makeNode('b) Samuel Ignacio Barreto Chamorro', null, '', 6),
+          makeNode('c) Leonardo Barreto Chamorro', null, '', 6),
+          makeNode('d) Juan Diego Barreto Chamorro', null, '', 6),
+          makeNode('e) Dominica Barreto Chamorro', null, '', 6),
+          makeNode('f) Paola Barreto Chamorro', null, '', 6),
+        ]),
+        makeNode('D. Javier Chamorro Cardenal', 'Sonia García Córdova', '', 5, [
+          makeNode('a) Francisco Xavier Chamorro García', null, '', 6),
+          makeNode('b) Carmen Margarita Chamorro García', null, '', 6),
+          makeNode('c) Gabriel Chamorro García', null, '', 6),
+          makeNode('d) Ana María Chamorro García', null, '', 6),
+        ]),
+        makeNode('E. Jaime Chamorro Cardenal', 'Hilda Argeñal Palma', '', 5, [
+          makeNode('a) Jaime Martín Chamorro Argeñal', null, '', 6),
+          makeNode('b) Alfonso Chamorro Argeñal', null, '', 6),
+          makeNode('c) Felipe Chamorro Argeñal', null, '', 6),
+          makeNode('d) María del Sagrado Chamorro Argeñal', null, '', 6),
+        ]),
+      ]),
+    ]),
+    makeNode('IV. Diego Manuel Chamorro Bolaños', 'Dolores Bolaños', '', 3, [
+      makeNode('1. Mercedes Chamorro Bolaños', 'Fernando Chamorro Chamorro', '', 4, [
+        makeNode('A. Edmundo Chamorro Chamorro', 'Blanca Rappaccioli Asenjo', '', 5, [
+          makeNode('a) Edmundo Chamorro Rappaccioli', null, '', 6),
+          makeNode('b) Melba Chamorro Rappaccioli (×Alejandro González)', null, '7 hijos González Chamorro', 6),
+          makeNode('c) Roberto Chamorro Rappaccioli', null, '', 6),
+          makeNode('d) Gretchen Chamorro Rappaccioli (×Edgar Briceño)', null, '4 hijos Briceño Chamorro', 6),
+          makeNode('e) Fernando Chamorro Rappaccioli (×Marta González)', null, '5 hijos Chamorro González', 6),
+          makeNode('f) Silvio Chamorro Rappaccioli (×Nubia González)', null, '', 6),
+          makeNode('g) Emiliano Chamorro Rappaccioli (×Lucy Romero)', null, '', 6),
+          makeNode('h) Blanca Chamorro Rappaccioli (×Daniel Lacayo)', null, '', 6),
+        ]),
+        makeNode('B. Humberta Chamorro Chamorro', 'Magdalena Mora Urtecho', '', 5, [
+          makeNode('a) Mercedes Jacinta Chamorro Mora (×Tomás Argüello)', null, '6 hijos', 6),
+          makeNode('b) Humberto Chamorro Mora', null, '', 6),
+          makeNode('c) Hilda Chamorro Mora (×José Adán Aguerrí)', null, '', 6),
+          makeNode('d) Caridad Chamorro Mora', null, '', 6),
+          makeNode('e) Álvaro Chamorro Mora (×Claudia Díaz)', null, '', 6),
+          makeNode('f) Luis Jerónimo Chamorro Mora (×Leticia Quiñónez)', null, '', 6),
+          makeNode('g) Francisco Javier Chamorro Mora', null, '', 6),
+        ]),
+        makeNode('C. Carmela Chamorro Chamorro', null, 'Soltera y sin sucesión', 5),
+        makeNode('D. Lala Chamorro Chamorro', null, '', 5),
+        makeNode('E. Hilda Chamorro Chamorro', null, 'Religiosa', 5),
+      ]),
+      makeNode('2. Carmen Chamorro Bolaños', 'Clarence A. Burgheim', '', 4, [
+        makeNode('A. Gretchen Burgheim Chamorro', 'William Griffith Haslam', '', 5, [
+          makeNode('a) Carmen Griffith Burgheim', null, '', 6),
+          makeNode('b) Lily Adelle Griffith Burgheim', null, '', 6),
+          makeNode('c) Albert William Griffith', null, '', 6),
+          makeNode('d) Anabelle Griffith', null, '', 6),
+          makeNode('e) Geraldine Griffith Burgheim', null, '', 6),
+          makeNode('f) Susanne Griffith Burgheim', null, '', 6),
+          makeNode('g) Lorena Griffith Burgheim', null, '', 6),
+          makeNode('h) Mary Gretchen Griffith', null, '', 6),
+        ]),
+      ]),
+      makeNode('3. Luz Chamorro Bolaños', 'Miguel Vigil Lejarza', '', 4),
+      makeNode('4. Matilde Chamorro Bolaños', null, 'Soltera y sin sucesión', 4),
+      makeNode('5. Fruto Chamorro Bolaños', null, 'Soltero y sin sucesión', 4),
+      makeNode('6. Celina Chamorro Bolaños', null, 'Soltera y sin sucesión', 4),
+      makeNode('7. Gustavo Chamorro Bolaños', null, 'Soltero y sin sucesión', 4),
+      makeNode('8. Diego Manuel Chamorro Bolaños', 'Caridad Mora Urtecho', '', 4, [
+        makeNode('A. Magdalena Chamorro Mora', 'Paul Spindola', 'Aún sin sucesión', 5),
+        makeNode('B. Diego Manuel Chamorro Mora', 'Vilma Mejía Lacayo', '', 5, [
+          makeNode('a) María Teresa Chamorro Mejía', null, '', 6),
+          makeNode('b) Vilma Auxiliadora Chamorro Mejía', null, '', 6),
+          makeNode('c) Diego Manuel Chamorro Mejía', null, '', 6),
+          makeNode('d) Salvador Chamorro Mejía', null, '', 6),
+          makeNode('e) María Haydeé Chamorro Mejía', null, '', 6),
+          makeNode('f) Gustavo Adolfo Chamorro Mejía', null, '', 6),
+          makeNode('g) María Dolores Chamorro Mejía', null, '', 6),
+        ]),
+        makeNode('C. Domingo Chamorro Mora', 'Dora Vega Gallegos', '', 5, [
+          makeNode('a) Rosanna Chamorro Vega', null, '', 6),
+          makeNode('b) Domingo Javier Chamorro Vega', null, '', 6),
+        ]),
+        makeNode('D. Salvador Chamorro Mora', null, 'Falleció en la infancia', 5),
+        makeNode('E. Rodrigo Chamorro Mora', null, 'Soltero', 5),
+        makeNode('F. Clarence Chamorro Mora', 'Ivette Castillo Sánchez', '', 5, [
+          makeNode('a) Clarence Adolfo Chamorro Castillo', null, '', 6),
+          makeNode('b) Luis Mauricio Chamorro Castillo', null, '', 6),
+        ]),
+        makeNode('G. Carmen Chamorro Mora', 'Alfonso González Pasos', '', 5, [
+          makeNode('a) María Caridad González Chamorro', null, '', 6),
+          makeNode('b) Alfonso Ramón González Chamorro', null, '', 6),
+          makeNode('c) Diego Manuel González Chamorro', null, '', 6),
+          makeNode('d) Rodrigo González Chamorro', null, '', 6),
+        ]),
+        makeNode('H. Rafael Chamorro Mora', 'María Elena Fletes Obregón', '', 5),
+        makeNode('I. Caridad Chamorro Mora', null, 'Falleció en la infancia', 5),
+        makeNode('J. María Eugenia Chamorro', 'John García', 'Aún sin descendencia', 5),
+        makeNode('K. Fruto Chamorro Mora', null, 'Soltero', 5),
+      ]),
+    ]),
+    makeNode('V. Filadelfo Chamorro Bolaños', 'Berta Benard Vivas', '', 3, [
+      makeNode('1. Cristina Chamorro Benard', 'Joaquín Cuadra Zavala', '', 4, [
+        makeNode('A. Mercedes Cuadra Chamorro', null, 'Soltera', 5),
+        makeNode('B. Berta Cuadra Chamorro', 'Fernando Horvilleur Barberena', '', 5),
+        makeNode('C. Joaquín Cuadra Chamorro', 'Maruca Lacayo Hurtado', '', 5, [
+          makeNode('a) María Margarita Cuadra Lacayo', null, '', 6),
+          makeNode('b) Joaquín Cuadra Lacayo', null, '', 6),
+          makeNode('c) Marta Lucía Cuadra Lacayo', null, '', 6),
+          makeNode('d) Cristina Cuadra Lacayo', null, '', 6),
+          makeNode('e) Berta Cecilia Cuadra Lacayo', null, '', 6),
+        ]),
+        makeNode('D. Anita Cuadra Chamorro', 'Benard Horvilleur Burlet', '', 5),
+        makeNode('E. María Cristina Cuadra Chamorro', null, 'Soltera', 5),
+        makeNode('F. Emilio Cuadra Chamorro', 'Katty Schultz Barberena', '', 5, [
+          makeNode('a) Emilio Cuadra Schultz', null, '', 6),
+          makeNode('b) Ernesto Cuadra Schultz', null, '', 6),
+          makeNode('c) Mauricio Cuadra Schultz', null, '', 6),
+          makeNode('d) Horacio Cuadra Schultz', null, '', 6),
+          makeNode('e) Mercedes Cuadra Schultz', null, '', 6),
+          makeNode('f) Gabriel Cuadra Schultz', null, '', 6),
+          makeNode('g) Humberto Cuadra Schultz', null, '', 6),
+          makeNode('h) Mario Cuadra Sanhueza', null, '', 6),
+        ]),
+        makeNode('G. Virginia Cuadra Chamorro', 'Manuel Cordero Sanhueza', '', 5, [
+          makeNode('a) Manuel Martín Cordero Cuadra', null, '', 6),
+          makeNode('b) Lydia Virginia Cordero Cuadra', null, '', 6),
+        ]),
+      ]),
+      makeNode('2. Emilio Chamorro Benard', 'María Pasos Zelaya', '', 4, [
+        makeNode('A. Emilio Chamorro Pasos', 'Cecilia Solórzano Chamorro', '', 5, [
+          makeNode('a) María Cecilia Chamorro Solórzano', null, '', 6),
+          makeNode('b) Emilio José Chamorro Solórzano', null, '', 6),
+          makeNode('c) María Gabriela Chamorro Solórzano', null, '', 6),
+        ]),
+        makeNode('B. Joaquín Chamorro Pasos', null, 'Soltero', 5),
+        makeNode('C. Gloria Chamorro Pasos', 'Roberto Sandino Muñoz', '', 5, [
+          makeNode('a) María Lucía Sandino Chamorro', null, '', 6),
+          makeNode('b) Claudia Sandino Chamorro', null, '', 6),
+        ]),
+        makeNode('D. Berta Chamorro Pasos', 'Alberto Chamorro Benard', '', 5, [
+          makeNode('a) Alberto Chamorro Chamorro', null, '', 6),
+          makeNode('b) Martín Chamorro Chamorro', null, '', 6),
+          makeNode('c) Alexis Chamorro Chamorro', null, '', 6),
+          makeNode('d) Allen Chamorro Chamorro', null, '', 6),
+        ]),
+        makeNode('E. Maruca Chamorro Pasos', 'Dionisio Cuadra Kautz', 'Aún sin sucesión', 5),
+        makeNode('F. Jeaninne Chamorro Pasos', null, 'Soltera', 5),
+      ]),
+      makeNode('3. Adela Chamorro Benard', 'Carlos Pellas Vivas', '', 4, [
+        makeNode('A. F. Alfredo Pellas Chamorro', 'Carmen (Nena) Chamorro Benard', '', 5, [
+          makeNode('a) Carlos Pellas Chamorro', null, '', 6),
+          makeNode('b) Alfredo Pellas Chamorro', null, '', 6),
+          makeNode('c) Silvia Pellas Chamorro', null, '', 6),
+          makeNode('d) Lucía Pellas Chamorro', null, '', 6),
+        ]),
+        makeNode('B. Rosita Pellas Chamorro', 'Arnoldo Solórzano Thompson', '', 5, [
+          makeNode('a) Adela Guadalupe Solórzano Pellas', null, '', 6),
+          makeNode('b) Arnoldo Solórzano Pellas', null, '', 6),
+          makeNode('c) Silvia Solórzano Pellas (Gemela)', null, '', 6),
+          makeNode('d) Silvana Solórzano Pellas (Gemela)', null, '', 6),
+          makeNode('e) Alfredo Solórzano Pellas', null, '', 6),
+          makeNode('f) Rosa Argentina Solórzano Pellas', null, '', 6),
+          makeNode('g) Ernesto Solórzano Pellas (Gemelo)', null, '', 6),
+          makeNode('h) Consuelo Solórzano Pellas (Gemelo)', null, '', 6),
+        ]),
+        makeNode('C. Adela Pellas Chamorro', 'Carlos José Solórzano Rivas', '', 5, [
+          makeNode('a) Scarlett Solórzano Pellas', null, '', 6),
+          makeNode('b) Roxana Solórzano Pellas', null, '', 6),
+          makeNode('c) Leonora Solórzano Pellas', null, '', 6),
+          makeNode('d) Desiree Solórzano Pellas', null, '', 6),
+        ]),
+      ]),
+      makeNode('4. Julio Chamorro Benard', 'Lola Coronel Urtecho', '', 4, [
+        makeNode('A. Filadelfo Chamorro Coronel', 'Sonia Duquestrada Sacasa', '', 5, [
+          makeNode('a) Juan Carlos Chamorro Duquestrada', null, '', 6),
+          makeNode('b) Blanca María Chamorro Duquestrada', null, '', 6),
+          makeNode('c) María Auxiliadora Chamorro Duquestrada', null, '', 6),
+        ]),
+        makeNode('B. Julio Chamorro Coronel', 'María Jesús Argüello Castillo', '', 5, [
+          makeNode('a) Miní Chamorro Argüello', null, '', 6),
+          makeNode('b) Julio Chamorro Argüello', null, '', 6),
+          makeNode('c) Fruto Chamorro Argüello', null, '', 6),
+        ]),
+        makeNode('C. Edgard Chamorro Coronel', null, 'Religioso', 5),
+        makeNode('D. Carlos Chamorro Coronel', null, 'Soltero', 5),
+        makeNode('E. Eduardo Chamorro Coronel', 'Katya Raskosky Holmann', '', 5, [
+          makeNode('a) Edgard José Chamorro Raskosky', null, '', 6),
+          makeNode('b) María Dolores Chamorro Raskosky', null, '', 6),
+          makeNode('c) Katya María Chamorro Raskosky', null, '', 6),
+        ]),
+        makeNode('F. José Chamorro Coronel', null, 'Soltero', 5),
+        makeNode('G. Franco Chamorro Coronel Duquestrada', 'Patricia Duquestrada Sacasa', '', 5, [
+          makeNode('a) Patricia Eugenia Chamorro Duquestrada', null, '', 6),
+          makeNode('b) Franco José Chamorro Duquestrada', null, '', 6),
+        ]),
+        makeNode('H. Blanca Chamorro Coronel', null, 'Soltera', 5),
+        makeNode('I. María Cristina Chamorro Coronel', null, 'Soltera', 5),
+        makeNode('J. Dolores Chamorro Coronel', null, 'Soltera', 5),
+        makeNode('K. Lucía Chamorro Coronel', null, 'Soltera', 5),
+      ]),
+    ]),
+    makeNode('VI. Carmela Chamorro Bolaños', 'Pedro Rafael Cuadra', '', 3, [
+      makeNode('1. Pedro Joaquín Cuadra Chamorro', 'Elena Argüello Ximénez', '', 4, [
+        makeNode('A. Luz Cuadra Argüello', 'Alejandro Valladares Terán', '', 5, [
+          makeNode('a) José Emilio Valladares Cuadra', null, '', 6),
+          makeNode('b) Ester María Valladares Cuadra', null, '', 6),
+          makeNode('c) Alejandro José Valladares Cuadra (Gemelo)', null, '', 6),
+          makeNode('d) Eleana del Carmen Valladares Cuadra', null, '', 6),
+        ]),
+        makeNode('B. Carmela Cuadra Argüello', null, 'Religiosa', 5),
+        makeNode('C. Julia Cuadra Argüello', 'Fernando Antonio Cuadra Lacayo', '', 5, [
+          makeNode('a) Fernando Antonio Cuadra Cuadra', null, '', 6),
+          makeNode('b) Consuelo Cuadra Cuadra', null, '', 6),
+          makeNode('c) Adán Cuadra Cuadra', null, '', 6),
+          makeNode('d) Jorge Cuadra Cuadra', null, '', 6),
+          makeNode('e) Ángela Cuadra Cuadra', null, '', 6),
+        ]),
+        makeNode('D. Esperanza Cuadra Argüello', 'Ernesto Ochoa Pineda', '', 5, [
+          makeNode('a) Esmeralda Ochoa Cuadra', null, '', 6),
+          makeNode('b) Julio Ernesto Ochoa Cuadra', null, '', 6),
+        ]),
+        makeNode('E. Pedro Rafael Cuadra Argüello', 'Lygia Morales Benard', '', 5, [
+          makeNode('a) Lygia Cuadra Morales', null, '', 6),
+          makeNode('b) Pedro Joaquín Cuadra Morales', null, '', 6),
+          makeNode('c) Carmen María Cuadra Morales', null, '', 6),
+          makeNode('d) Humberto Cuadra Morales', null, '', 6),
+          makeNode('e) Javier Cuadra Morales', null, '', 6),
+          makeNode('f) Lucía Cuadra Morales', null, '', 6),
+        ]),
+        makeNode('F. Consuelo Cuadra Argüello', null, '', 5),
+        makeNode('G. José Cuadra Argüello', 'Yolanda García Córdoba', '', 5, [
+          makeNode('a) José Alfonso Cuadra Cuadra', null, '', 6),
+          makeNode('b) Juan Bosco Cuadra Cuadra', null, '', 6),
+          makeNode('c) Alfredo Cuadra García', null, '', 6),
+          makeNode('d) Ricardo Cuadra Cuadra', null, '', 6),
+          makeNode('e) Rodrigo Cuadra García', null, '', 6),
+        ]),
+        makeNode('H. María Elena Cuadra Argüello', 'Francisco Lacayo Maison', '', 5, [
+          makeNode('a) Melania Lacayo Cuadra', null, '', 6),
+        ]),
+      ]),
+    ]),
+    makeNode('VII. Dominga Chamorro', 'Salvador Chamorro Alfaro', 'Hija reconocida', 3),
+    makeNode('VIII. Segundo Chamorro', 'Concepción Argüello Guerre', 'Hijo reconocido', 3, [
+      makeNode('1. María Chamorro Argüello', 'Juan José Burgos Bodán', '', 4, [
+        makeNode('A. Guillermina Burgos Chamorro', null, '', 5),
+        makeNode('B. Ena Burgos Chamorro', 'Edward Chamy', '', 5, [
+          makeNode('a) Edwin Chamy Burgos', null, '', 6),
+          makeNode('b) Edward Chamy Burgos', null, '', 6),
+        ]),
+        makeNode('C. Gloria Burgos Chamorro', 'Ernesto Mejía Vargas', '', 5, [
+          makeNode('1) Margarita Mejía Burgos', null, '', 6),
+          makeNode('2) Ernesto Mejía Burgos', null, '', 6),
+        ]),
+        makeNode('D. Yelba Burgos Chamorro', null, 'Soltera', 5),
+        makeNode('E. Juan José Burgos Chamorro', 'Magdalena Lacayo Luna', '', 5, [
+          makeNode('a) Gustavo Alberto Burgos', null, '', 6),
+          makeNode('b) Ana Guillermina Burgos', null, '', 6),
+          makeNode('c) Magda María Burgos Lacayo', null, '', 6),
+          makeNode('d) Cecilia Amanda Burgos Lacayo', null, '', 6),
+          makeNode('e) Juan José Burgos Lacayo', null, '', 6),
+        ]),
+        makeNode('F. Doris Burgos Chamorro', 'Gonzalo Meneses Ocón', '', 5, [
+          makeNode('a) Marta Virginia Meneses Burgos', null, '', 6),
+          makeNode('b) Gonzalo José Meneses Burgos', null, '', 6),
+        ]),
+      ]),
+      makeNode('2. Segundo Chamorro Argüello', 'Matilde Cuadra Downing', '', 4, [
+        makeNode('A. Amalia Chamorro Cuadra', 'Francisco Solano Gómez', '', 5, [
+          makeNode('a) Margarita Solano Chamorro', null, '', 6),
+          makeNode('b) Alina Julia Solano Chamorro', null, '', 6),
+        ]),
+        makeNode('B. Segundo Chamorro Cuadra', null, 'Soltero', 5),
+        makeNode('C. Jaime Chamorro Cuadra', null, '', 5),
+      ]),
+    ]),
+  ])
+];
+
+// === RAMA II: FERNANDO CHAMORRO ALFARO ===
+const fernandoData = [
+  makeNode('Fernando Chamorro Alfaro', 'Anita Argüello Imeri', '', 2, [
+    makeNode('I. Alejandro Chamorro Argüello', 'Julia Pasos Bermúdez', '', 3, [
+      makeNode('1. Anita Chamorro Pasos', 'Alfonso Hurtado Abaunza', '', 4, [
+        makeNode('A. Julia Hurtado Chamorro', 'Gonzalo Benard Guzmán', '', 5, [
+          makeNode('1) Luis Benard Hurtado (×Nandaime Benard Horvilleur)', null, '', 6),
+          makeNode('2) Lucía Benard Hurtado (×Miguel Valdejulli)', null, '', 6),
+        ]),
+        makeNode('B. Alejandro Hurtado Chamorro', 'Julia Chamorro Barillas', '', 5),
+        makeNode('C. William Hurtado Chamorro', 'Margarita Horvilleur Barberena', 'Sin sucesión', 5),
+        makeNode('D. Celia Hurtado Chamorro (1ras Nupcias)', 'Alfredo Palazio Frixione', '', 5, [
+          makeNode('1) Ernesto Palazio Hurtado', null, '', 6),
+          makeNode('2) Sandra Palazio Hurtado', null, '', 6),
+        ]),
+      ]),
+      makeNode('2. Fernando Chamorro Pasos', 'Dorothy Davidson', '', 4),
+    ]),
+    makeNode('II. Fernando Chamorro Argüello', null, 'Falleció en la infancia', 3),
+    makeNode('III. Francisco Chamorro Argüello', null, 'Falleció soltero', 3),
+    makeNode('IV. Fernando Chamorro', 'Delfina Lacayo Lacayo', 'Sin sucesión', 3),
+  ]),
+  makeNode('5. Alberto Chamorro', 'Emilia Pasos Bermúdez', '', 2, [
+    makeNode('1. Amanda Chamorro Pasos', 'José César Chamorro', '', 3, [
+      makeNode('A. Margarita César Chamorro', 'Fernando Agüero Rocha', '', 4, [
+        makeNode('1) Amanda Ninoska Agüero César', null, '', 5),
+        makeNode('2) Fernando Agüero César', null, '', 5),
+      ]),
+    ]),
+    makeNode('2. Alberto Chamorro Pasos', 'Gertrudis Zinc', '', 3, [
+      makeNode('A. Fernando Chamorro Zinc', 'Sarita Padilla Castillo', '', 4, [
+        makeNode('a) Lorena Margarita Chamorro Padilla', null, '', 5),
+        makeNode('b) María Gertrudis Chamorro Padilla', null, '', 5),
+        makeNode('c) Sarah Chamorro Padilla', null, '', 5),
+        makeNode('d) Fernando José Chamorro Padilla', null, '', 5),
+        makeNode('e) Jorge Alberto Chamorro Padilla', null, '', 5),
+      ]),
+      makeNode('B. Gladys Chamorro Zinc', 'Juan Esquivel', '', 4, [
+        makeNode('1) Celina Esquivel Chamorro (×Harvey Leach)', null, '', 5),
+      ]),
+      makeNode('C. Roberto Chamorro Zinc', 'Marina Chamorro Barillas', '', 4, [
+        makeNode('a) Claudia Chamorro Chamorro', null, '', 5),
+        makeNode('b) Violeta Chamorro Chamorro', null, '', 5),
+        makeNode('c) Alberto Chamorro Chamorro', null, '', 5),
+        makeNode('d) Clarence Chamorro Chamorro', null, '', 5),
+        makeNode('e) Marcelo Chamorro', null, '', 5),
+      ]),
+    ]),
+    makeNode('3. Ernesto Chamorro Pasos', 'Carmen Benard Lacayo', '', 3, [
+      makeNode('A. Alberto Chamorro Benard', 'Berta Chamorro Pasos', '', 4, [
+        makeNode('a) Alberto Chamorro Chamorro', null, '', 5),
+        makeNode('b) Martín Chamorro Chamorro', null, '', 5),
+        makeNode('c) Alexis Chamorro Chamorro', null, '', 5),
+        makeNode('d) Allen Chamorro Chamorro', null, '', 5),
+      ]),
+      makeNode('B. Ernesto Chamorro Benard', 'Celia Martínez Román', '', 4, [
+        makeNode('a) Ernesto Chamorro Martínez', null, '', 5),
+        makeNode('b) René Chamorro Martínez', null, '', 5),
+        makeNode('c) Carmen María Chamorro Martínez', null, '', 5),
+        makeNode('d) María Celia Chamorro Martínez', null, '', 5),
+      ]),
+      makeNode('C. Carmen (Nena) Chamorro Benard', 'F. Alfredo Pellas Chamorro', '', 4, [
+        makeNode('a) Carlos Pellas Chamorro', null, '', 5),
+        makeNode('b) Alfredo Pellas Chamorro', null, '', 5),
+        makeNode('c) Silvio Pellas Chamorro', null, '', 5),
+        makeNode('d) Lucía Pellas Chamorro', null, '', 5),
+      ]),
+    ]),
+    makeNode('4. Lydia Chamorro Pasos', 'Pedro Cabrera Lezcano', '', 3, [
+      makeNode('A. Rafael Cabrera Chamorro', 'Dorothy Holmes', '', 4, [
+        makeNode('a) Milena Cabrera Holmes', null, '', 5),
+        makeNode('b) Reina Carole Cabrera Holmes', null, '', 5),
+      ]),
+      makeNode('B. Violeta Cabrera Chamorro', 'Andrés Marc Bronner', '', 4, [
+        makeNode('a) Chantal Bronner Cabrera', null, '', 5),
+        makeNode('b) Gisel Bronner Cabrera', null, '', 5),
+      ]),
+    ]),
+    makeNode('5. Amelia Chamorro', 'Santiago Aráuz', 'Sin sucesión', 3),
+    makeNode('6. Josefina Chamorro', 'Antonio Ortega Mora', '', 3, [
+      makeNode('A. Guillermo Ortega Chamorro', 'Isabel de Ortega', '', 4, [
+        makeNode('a) Guillermo Alberto Ortega', null, '', 5),
+        makeNode('b) Olga Ortega Chamorro', null, '', 5),
+        makeNode('c) Juan de Dios Ortega Chamorro', null, '', 5),
+        makeNode('d) María Antonio Ortega Chamorro', null, '', 5),
+      ]),
+      makeNode('B. Horacio Ortega Chamorro', 'María Luisa Gurdián Castro', '', 4, [
+        makeNode('a) Josefina Ortega Gurdián', null, '', 5),
+        makeNode('b) Luisiana María Ortega Gurdián', null, '', 5),
+        makeNode('c) Ana Isabel Ortega Gurdián', null, '', 5),
+      ]),
+      makeNode('C. Adela Ortega Chamorro', 'Adán Enríquez', 'Sin sucesión', 4),
+      makeNode('D. Esmeralda Ortega Chamorro', 'Jorge González Caldera', '', 4, [
+        makeNode('a) Lila de Jesús González Ortega', null, '', 5),
+        makeNode('b) Rosa Isabel González Ortega', null, '', 5),
+        makeNode('c) Karla Esmeralda González Ortega', null, '', 5),
+        makeNode('d) Sergio José González Ortega', null, '', 5),
+        makeNode('e) Alberto Antonio González Ortega', null, '', 5),
+        makeNode('f) Mauricio José González Ortega', null, '', 5),
+        makeNode('g) Guillermo José González Ortega', null, '', 5),
+        makeNode('h) Mariela González Ortega', null, '', 5),
+        makeNode('i) Lucía de Fátima González Ortega', null, '', 5),
+      ]),
+      makeNode('E. José Ortega Chamorro', 'Aura Robleto Medrano', '', 4, [
+        makeNode('a) José Rolando Ortega Robleto', null, '', 5),
+        makeNode('b) Lygia del Socorro Ortega Robleto', null, '', 5),
+        makeNode('c) Iván Antonio Ortega Robleto', null, '', 5),
+        makeNode('d) Luvy del Rosario Ortega Robleto', null, '', 5),
+        makeNode('e) María Cecilia Ortega Robleto', null, '', 5),
+        makeNode('f) Carmen Victoria Ortega Robleto', null, '', 5),
+        makeNode('g) Aura Marta Ortega Robleto', null, '', 5),
+      ]),
+    ]),
+    makeNode('f) Alfredo Chamorro', 'Adelaida Castrillo', '', 3, [
+      makeNode('A. Alfredo Chamorro Castrillo', 'Thylma Ubeda', '', 4, [
+        makeNode('a) Xiomara Chamorro Ubeda', null, '', 5),
+        makeNode('b) Alfredo Chamorro Ubeda', null, '', 5),
+        makeNode('c) Francisco Adrián Chamorro Ubeda', null, '', 5),
+        makeNode('d) Roberto Antonio Chamorro Ubeda', null, '', 5),
+      ]),
+      makeNode('B. Violeta Chamorro Castillo', null, '', 4),
+      makeNode('C. Melba Chamorro Castillo', 'Guillermo Robleto Castillo', '', 4, [
+        makeNode('a) Octavio Robleto Chamorro', null, '', 5),
+        makeNode('b) María Elena Robleto Chamorro', null, '', 5),
+      ]),
+    ]),
+  ]),
+];
+
+// === RAMA III: DIONISIO CHAMORRO ALFARO ===
+const dionisioData = [
+  makeNode('Dionisio Chamorro Alfaro', 'Mercedes Oreamuno Abaunza (2das Nupcias)', 'Primeras nupcias con Camila Benard (sin desc.)', 2, [
+    makeNode('I. Dionisio Chamorro Oreamuno', 'Carmela Benard Vivas', '', 3, [
+      makeNode('1. Dionisio Chamorro Benard', 'Ernestina Wolf Salomón', '', 4, [
+        makeNode('A. José Dionisio Chamorro Wolf', 'Gloria Chamorro Barillas', '', 5, [
+          makeNode('a) José Dionisio Chamorro Chamorro', null, '', 6),
+          makeNode('b) Carlos Chamorro Chamorro', null, '', 6),
+          makeNode('c) Mauricio Chamorro Chamorro', null, '', 6),
+          makeNode('d) Ana Dennise Chamorro Chamorro', null, '', 6),
+        ]),
+        makeNode('B. Alfredo Chamorro Wolf', 'Teresita Chamorro Carazo', '', 5, [
+          makeNode('a) Alfredo Alejandro Chamorro Chamorro', null, '', 6),
+          makeNode('b) Danilo Chamorro Chamorro', null, '', 6),
+          makeNode('c) Grace Chamorro Chamorro', null, '', 6),
+        ]),
+        makeNode('C. Silvio Chamorro Wolf', 'Maya Favilli Picasso', '', 5, [
+          makeNode('a) María Ernestina Chamorro Favilli', null, '', 6),
+          makeNode('b) Silvio José Chamorro Favilli', null, '', 6),
+          makeNode('c) Mario Chamorro Favilli', null, '', 6),
+          makeNode('d) Lucía Chamorro Favilli', null, '', 6),
+          makeNode('e) Maya Chamorro Favilli', null, '', 6),
+        ]),
+      ]),
+      makeNode('2. Angélica Chamorro Benard', 'Octaviano César Chamorro', '', 4, [
+        makeNode('A. Alfredo César Chamorro', 'Rosita Aguirre Martínez', '', 5, [
+          makeNode('a) Octaviano César Aguirre', null, '', 6),
+          makeNode('b) Lucía César Aguirre', null, '', 6),
+          makeNode('c) Marisol César Aguirre', null, '', 6),
+          makeNode('d) Alfredo César Aguirre', null, '', 6),
+        ]),
+        makeNode('B. Pedro César Chamorro', null, 'Soltero', 5),
+        makeNode('C. José César Chamorro (1ras Nupcias)', 'Aida Cuadra Lacayo', '', 5, [
+          makeNode('a) José César Cuadra', null, '', 6),
+          makeNode('b) Carlos César Cuadra', null, '', 6),
+          makeNode('c) Aída César Cuadra', null, '', 6),
+        ]),
+        makeNode('C. José César Chamorro (2das Nupcias)', 'Felicidad Reyes', '', 5, [
+          makeNode('d) Javier César Reyes', null, '', 6),
+          makeNode('e) María Inez César Reyes', null, '', 6),
+          makeNode('f) Francisco César Reyes', null, '', 6),
+        ]),
+        makeNode('D. Lourdes César Chamorro', 'Adolfo Chamorro Barillas', '', 5, [
+          makeNode('a) Leandro Chamorro César', null, '', 6),
+          makeNode('b) María Angélica Chamorro César', null, '', 6),
+          makeNode('c) María Lourdes Chamorro César', null, '', 6),
+          makeNode('d) Adolfo Chamorro César', null, '', 6),
+          makeNode('e) Pacelli Chamorro César', null, '', 6),
+          makeNode('f) Cecilia Chamorro César', null, '', 6),
+          makeNode('g) Guillermo Chamorro César', null, '', 6),
+        ]),
+      ]),
+      makeNode('3. Rosendo Chamorro Benard', null, 'Casado con Agustina Benard Guzmán', 4, [
+        makeNode('A. Adolfo Chamorro Benard', 'Bertita Téfel Vélez', '', 5, [
+          makeNode('I. Carlos Chamorro Benard', 'Leonor Mayorga Lacayo', '', 6, [
+            makeNode('A. Renee Chamorro Mayorga', 'Bryan Ronald Cargill', '', 7, [
+              makeNode('a) Bryan Cargill Chamorro', null, '', 8),
+              makeNode('b) Ronald Cargill Chamorro', null, '', 8),
+            ]),
+          ]),
+          makeNode('a) Consuelo Chamorro Téfel', null, '', 6),
+          makeNode('b) Reinaldo Chamorro Téfel', null, '', 6),
+          makeNode('c) Adolfo Chamorro Téfel', null, '', 6),
+          makeNode('d) Gina Chamorro Téfel', null, '', 6),
+          makeNode('e) Luis Chamorro Téfel', null, '', 6),
+          makeNode('f) Pilar Chamorro Téfel', null, '', 6),
+        ]),
+        makeNode('B. Consuelo Chamorro Benard (Gemela)', 'Luis Procuna Montes', '', 5, [
+          makeNode('a) Amparo Procuna Chamorro (×Ernesto Weinstein)', null, '', 6),
+          makeNode('b) Flor de María Procuna Chamorro', null, '', 6),
+          makeNode('c) Carmen Procuna Chamorro', null, '', 6),
+          makeNode('d) Luis Procuna Chamorro', null, '', 6),
+          makeNode('e) Rosendo Procuna Chamorro', null, '', 6),
+        ]),
+        makeNode('C. Rosendo Chamorro Benard', 'Soledad Argüello Wheelock', '', 5, [
+          makeNode('a) Regina Chamorro Argüello', null, '', 6),
+          makeNode('b) Marcela Chamorro Argüello', null, '', 6),
+          makeNode('c) María Agustina Chamorro Argüello', null, '', 6),
+          makeNode('d) Barry Chamorro Argüello', null, '', 6),
+        ]),
+      ]),
+    ]),
+    makeNode('II. Rosendo Chamorro Oreamuno', 'Emilio Solórzano', '', 3, [
+      makeNode('1. Emilia Chamorro Solórzano', 'Rodolfo Vivas', '', 4, [
+        makeNode('A. Violeta Vivas Chamorro', 'José Cardenal Argüello', '', 5, [
+          makeNode('a) José Cardenal Vivas', null, '', 6),
+          makeNode('b) Jorge Cardenal Vivas', null, '', 6),
+          makeNode('c) Javier Cardenal Vivas', null, '', 6),
+          makeNode('d) Juan Ignacio Cardenal Vivas', null, '', 6),
+        ]),
+        makeNode('B. Rodolfo Vivas Chamorro', 'Isabel Margarita Alonso', '', 5, [
+          makeNode('a) Rodolfo Vivas Martínez', null, '', 6),
+          makeNode('b) María Isabel Vivas Martínez', null, '', 6),
+          makeNode('c) Emilia Margarita Vivas Martínez', null, '', 6),
+          makeNode('d) María Lourdes Vivas Martínez', null, '', 6),
+          makeNode('e) María Violeta Vivas Martínez', null, '', 6),
+          makeNode('f) María Mercedes Vivas Martínez', null, '', 6),
+        ]),
+        makeNode('C. Emilia Vivas Chamorro', 'Procopio Sclafani', '', 5),
+      ]),
+      makeNode('2. Octaviano César Chamorro', null, '', 4),
+      makeNode('3. Enrique Chamorro Solórzano', 'María Engracia Carazo Morales', '', 4, [
+        makeNode('A. Enrique Chamorro Carazo', 'Amalia Benard Wheelock', '', 5, [
+          makeNode('a) María Amalia Chamorro Benard', null, '', 6),
+          makeNode('b) María Lourdes Chamorro Benard', null, '', 6),
+        ]),
+        makeNode('B. Myriam Chamorro Carazo', 'Helmer Simons', '', 5, [
+          makeNode('a) Heiner Simons Chamorro', null, '', 6),
+          makeNode('b) Helmi Simons Chamorro', null, '', 6),
+          makeNode('c) Ana Lisa Simons Chamorro', null, '', 6),
+          makeNode('d) Sigrid Simons Chamorro', null, '', 6),
+          makeNode('e) Evaristo Simons Chamorro', null, '', 6),
+        ]),
+        makeNode('C. María de Jesús Chamorro Carazo', 'Rodolfo Cardenal Martínez', '', 5, [
+          makeNode('a) Rodolfo Cardenal Chamorro', null, '', 6),
+          makeNode('b) Mario Cardenal Chamorro', null, '', 6),
+          makeNode('c) María de Jesús Cardenal Chamorro', null, '', 6),
+          makeNode('d) Bernardo Cardenal Chamorro', null, '', 6),
+        ]),
+        makeNode('D. Mario Chamorro Carazo', null, 'Sacerdote', 5),
+        makeNode('E. Grace Chamorro Carazo', null, 'Religiosa', 5),
+      ]),
+      makeNode('4. Amalia Chamorro Solórzano', 'William Godfrey', 'Sin descendencia', 4),
+      makeNode('5. Alejandro Chamorro Solórzano (1ras Nupcias)', 'Teresa Carazo Morales', '', 4, [
+        makeNode('A. Alfredo Alejandro Chamorro Chamorro', null, '', 5),
+        makeNode('B. Danilo Chamorro Chamorro', null, '', 5),
+        makeNode('C. Grace Chamorro Chamorro', null, '', 5),
+        makeNode('II. Alejandro Chamorro Carazo', null, 'Soltero', 5),
+        makeNode('C. Francisco Chamorro Carazo', 'Gladys Sandino Lacayo', '', 5, [
+          makeNode('a) María Alejandra Chamorro Sandino', null, '', 6),
+          makeNode('b) María Patricia Chamorro Sandino', null, '', 6),
+          makeNode('c) María Teresa Chamorro Sandino', null, '', 6),
+          makeNode('d) Francisco Javier Chamorro Sandino', null, '', 6),
+        ]),
+        makeNode('D. Bosco Chamorro Carazo', 'Carmen Monterrey Muñoz', '', 5, [
+          makeNode('a) Carmen María Chamorro Monterrey', null, '', 6),
+          makeNode('b) María Dolores Chamorro Monterrey', null, '', 6),
+        ]),
+      ]),
+      makeNode('5b. Alejandro Chamorro Solórzano (2das Nupcias)', 'Isabel Cuadra Cardenal', '', 4, [
+        makeNode('E. Carlos José Chamorro Cuadra', 'Jeane Butler', '', 5, [
+          makeNode('a) Carlos José Chamorro Butler', null, '', 6),
+        ]),
+        makeNode('F. Luis Alberto Chamorro Cuadra', null, '', 5),
+        makeNode('G. Jorge Chamorro Cuadra', null, '', 5),
+        makeNode('H. Bernardo Chamorro Cuadra', null, '', 5),
+        makeNode('I. Edgar Chamorro Cuadra', null, '', 5),
+        makeNode('J. Noel Chamorro Cuadra', null, '', 5),
+        makeNode('K. Milonga Chamorro Cuadra', null, '', 5),
+        makeNode('L. María Chamorro Cuadra', null, '', 5),
+        makeNode('M. María Isabel Chamorro Cuadra', null, '', 5),
+        makeNode('N. Federico Chamorro Cuadra', null, '', 5),
+      ]),
+    ]),
+    makeNode('III. Margarita Chamorro Oreamuno', 'Octaviano César Abaúnza', '', 3, [
+      makeNode('1. Mercedes César Chamorro', 'Germán Arellano Sequeira', '', 4, [
+        makeNode('A. Mercedes Arellano César', 'José Caso Ubago', 'Sin sucesión', 5),
+        makeNode('B. David Arellano César', null, 'Soltero, sin sucesión', 5),
+      ]),
+      makeNode('2. Dionisio Chamorro Oreamuno', null, 'Con descendencia', 4),
+      makeNode('3. José César Chamorro', 'Amanda Chamorro Pasos', '', 4, [
+        makeNode('A. Margarita César Chamorro', 'Fernando Agüero Rocha', '', 5, [
+          makeNode('a) Amanda Ninoska Agüero César', null, '', 6),
+          makeNode('b) Fernando José Agüero César', null, '', 6),
+        ]),
+      ]),
+      makeNode('4. Alejandro César Chamorro', 'María Benard', '', 4, [
+        makeNode('A. Amalia César Benard', 'Alfredo Federico Bosche', '', 5, [
+          makeNode('a) John Bosche César', null, '', 6),
+          makeNode('b) Paul Bosche César', null, '', 6),
+          makeNode('c) María Alejandra Bosche César', null, '', 6),
+        ]),
+        makeNode('E. Maruca César Benard', 'Caricia Gómez Argüello', '', 5, [
+          makeNode('a) Isalda Gómez César', null, '', 6),
+          makeNode('b) Alejandro Gómez César', null, '', 6),
+          makeNode('c) Joaquín Gómez César', null, '', 6),
+          makeNode('d) Miguel Gómez César', null, '', 6),
+        ]),
+      ]),
+    ]),
+    makeNode('IV. Agustín Chamorro Oreamuno', 'Emma Downing Selva', '', 3, [
+      makeNode('1. Julia Chamorro Downing', 'Ernesto Fernández', '', 4, [
+        makeNode('A. Ernesto Fernández Chamorro', 'Anita Holmann Morice', '', 5, [
+          makeNode('a) Róger Fernández Holmann', null, '', 6),
+          makeNode('b) Ernesto Fernández Holmann', null, '', 6),
+          makeNode('c) Carlos José Fernández Holmann', null, '', 6),
+        ]),
+      ]),
+      makeNode('2. Agustín Chamorro Downing', 'Guillermina Benard Lacayo', '', 4, [
+        makeNode('A. Alejandro Chamorro Benard', 'Lypsia Flores', '', 5, [
+          makeNode('a) Jean Pierre Chamorro Flores', null, '', 6),
+        ]),
+        makeNode('B. Emilia Chamorro Benard', 'Francisco Méndez', '', 5, [
+          makeNode('a) Francisco Méndez Chamorro', null, '', 6),
+          makeNode('b) Lucía Méndez Chamorro', null, '', 6),
+          makeNode('c) Alexis Méndez Chamorro', null, '', 6),
+        ]),
+      ]),
+    ]),
+    makeNode('V. Salvador Chamorro Oreamuno', 'Dominga Chamorro (prima hermana)', '', 3, [
+      makeNode('1. Fernando Chamorro Chamorro', 'Mercedes Jacinta Chamorro Bolaños', 'Hijo del Pdte. Diego Manuel Chamorro', 4, [
+        makeNode('→ [ver Rama I, IV.1 — Edmundo, Humberta, etc.]', null, 'Mismos descendientes que en archivo nuevo', 5),
+      ]),
+      makeNode('2. Lola Chamorro Chamorro', 'Ernaldo Lacayo Lacayo', '', 4, [
+        makeNode('A. José Antonio Lacayo Chamorro', 'Nelly Vargas Maroney', '', 5, [
+          makeNode('a) Alberto Lacayo Vargas', null, '', 6),
+          makeNode('b) Salvador Lacayo Vargas', null, '', 6),
+          makeNode('c) Consuelo Lacayo Vargas', null, '', 6),
+          makeNode('d) Nely Lacayo Vargas', null, '', 6),
+          makeNode('e) José Antonio Lacayo Vargas', null, '', 6),
+          makeNode('f) Lucía Lacayo Vargas', null, '', 6),
+        ]),
+        makeNode('B. Ernaldo Lacayo Chamorro', 'Irma Sequeira Parodi', '', 5, [
+          makeNode('a) Vilma Lacayo Sequeira', null, '', 6),
+        ]),
+        makeNode('C. Pedro José Lacayo Chamorro', 'Rosa Reyes Argeñal', '', 5, [
+          makeNode('a) Iván Lacayo Reyes', null, '', 6),
+          makeNode('b) Lola Lacayo Reyes', null, '', 6),
+          makeNode('c) Ernaldo Lacayo Reyes', null, '', 6),
+          makeNode('d) Leonel Lacayo Reyes', null, '', 6),
+          makeNode('e) Pedro José Lacayo Reyes', null, '', 6),
+          makeNode('f) Javier Lacayo Reyes', null, '', 6),
+        ]),
+        makeNode('D. César Lacayo Chamorro (1ras Nupcias)', 'Julieta Solís Morales', '', 5, [
+          makeNode('a) Edgar Lacayo Solís', null, '', 6),
+        ]),
+        makeNode('D. César Lacayo Chamorro (2das Nupcias)', 'Carmen Mondragón', '', 5, [
+          makeNode('a) Alfonso Lacayo Mondragón', null, '', 6),
+          makeNode('b) Roger Lacayo Mondragón', null, '', 6),
+          makeNode('c) Alfredo Lacayo Mondragón', null, '', 6),
+        ]),
+        makeNode('E. Guillermo Lacayo Chamorro', null, 'Falleció soltero, sin sucesión', 5),
+        makeNode('F. Alfonso Lacayo Chamorro', 'Elida Núñez', '', 5, [
+          makeNode('a) Donald Lacayo Núñez', null, '', 6),
+          makeNode('b) Socorro Lacayo Núñez', null, '', 6),
+          makeNode('c) Allan Lacayo Núñez', null, '', 6),
+        ]),
+      ]),
+      makeNode('3. Carlos Chamorro Chamorro (1ras Nupcias)', 'Julia Barillas Jiménez', '', 4),
+      makeNode('3b. Carlos Chamorro Chamorro (2das Nupcias)', 'Carmen Jarquín Vallecillo', 'Sin sucesión', 4),
+      makeNode('4. Salvador Chamorro Chamorro', 'Georgete de Chamorro (Francia)', '', 4, [
+        makeNode('A. Fernando Chamorro', null, '', 5),
+        makeNode('B. Pedro Chamorro', null, '', 5),
+      ]),
+      makeNode('5. Emiliano Chamorro', 'Lastenia Enríquez Bermúdez / Mercedes (2das)', 'Presidente de la República', 4),
+      makeNode('6. Carlota Chamorro', 'Antonio Belli', '', 4, [
+        makeNode('A. Enrique Belli Chamorro', 'Manuela Cortez Marín / Berta Calvo', '', 5),
+        makeNode('B. Pedro Belli Chamorro', 'Mercedes Alfaro Rivera', '', 5, [
+          makeNode('a) Carlos Belli Alfaro', null, '', 6),
+          makeNode('b) Mario Belli Alfaro', null, '', 6),
+          makeNode('c) Alberto Belli Alfaro', null, '', 6),
+          makeNode('d) Elena Belli Alfaro', null, '', 6),
+          makeNode('e) Gladis Belli Alfaro', null, '', 6),
+          makeNode('f) Pedro Belli Alfaro', null, '', 6),
+          makeNode('g) Humberto Belli', null, '', 6),
+        ]),
+        makeNode('C. María Belli Chamorro', 'José Frixione', 'Sin sucesión', 5),
+        makeNode('D. Margarita Belli Chamorro', 'Juan Manuel Rappaccioli', 'Sin sucesión', 5),
+        makeNode('E. Elena Belli Chamorro', 'Gonzalo Solórzano Ramírez', '', 5, [
+          makeNode('a) Gonzalo Solórzano Belli (×María Lourdes Arana)', null, '4 hijos', 6),
+          makeNode('b) María Elena Solórzano Belli (×Jess Barrow)', null, '3 hijos', 6),
+          makeNode('c) Mauricio Solórzano Belli (×Teresa Carrión)', null, '2 hijos', 6),
+          makeNode('d) María Eugenia Solórzano Belli (×Enrique Gabuardi)', null, '4 hijos', 6),
+          makeNode('e) Carlota Solórzano Belli (×Rolando Mendoza)', null, '1 hijo', 6),
+        ]),
+      ]),
+    ]),
+    makeNode('VI. Reyes Chamorro (hija reconocida)', 'Salvador Morales', '', 3, [
+      makeNode('1. Carlos Morales Chamorro', null, 'Falleció soltero, sin sucesión', 4),
+      makeNode('2. Salvador Morales Chamorro', 'Josefa Dolores Fonseca Fariñas', '', 4, [
+        makeNode('A. Berta Morales Fonseca', 'Miguel Gutiérrez Matus', '', 5),
+        makeNode('B. Mélida Morales Fonseca', 'Sinforoso Estrada Alvarado', '', 5),
+        makeNode('C. Salvador Morales Chamorro', null, 'Soltero, sin sucesión', 5),
+        makeNode('D. Gonzalo Morales Flores', 'Isabel Flores Fariña', '', 5),
+        makeNode('E. Guillermina Morales Fonseca', 'Humberto Luna', '', 5),
+        makeNode('F. Irma Morales Fonseca', 'Carlos Zavala Flores', '', 5),
+      ]),
+      makeNode('3. Petrona Morales Chamorro', null, 'Falleció soltera, sin sucesión', 4),
+      makeNode('4. Mercedes Morales Chamorro', 'Manuel R. González', '', 4, [
+        makeNode('A. Mercedes González Morales', 'Alejandro Sevilla Falla', '', 5),
+        makeNode('B. Manuel González Morales', 'Julia Sandino Ramírez', '', 5),
+        makeNode('C. Margarita González Morales', 'Isaac Orzinski Rosenberg', '', 5),
+      ]),
+    ]),
+    makeNode('VII. Mariana Chamorro (hija reconocida)', null, 'Falleció soltera, sin sucesión', 3),
+    makeNode('VIII. Carlota Chamorro (hija reconocida)', null, 'Falleció soltera, sin sucesión', 3),
+    makeNode('IX. Luisa Chamorro (hija reconocida)', null, 'Religiosa', 3),
+  ])
+];
+
+// === RAMA FRUTO CHAMORRO ===
+const frutoData = [
+  makeNode('Fruto Chamorro', 'Mercedes Avilés', 'Hija de Leopoldo Avilés y Juana Alfaro Monterroso', 2, [
+    makeNode('I. Mercedes Jacinta Chamorro Avilés', 'José Miguel Bolaños Bendaña', '', 3, [
+      makeNode('1. Fruto Bolaños Chamorro', 'Pastora Zelaya Bolaños', '', 4, [
+        makeNode('A. Miguel Bolaños Zelaya (1ras Nupcias)', 'Berta Vargas Gavinet', '', 5, [
+          makeNode('1) Alicia Bolaños Vargas', null, '', 6),
+          makeNode('2) Rodolfo Bolaños Vargas', 'Gloria Hunter', '', 6),
+          makeNode('3) Fruto Bolaños Vargas', 'Berta Tellería', '', 6),
+          makeNode('4) Myriam Bolaños Vargas', 'Fernando Guzmán Zapata', '', 6),
+          makeNode('5) Violeta Bolaños Vargas', 'Benjamín Galindo', '', 6),
+          makeNode('6) René Bolaños Vargas', 'Robert Kelly', '', 6),
+          makeNode('7) Berta Bolaños Vargas', 'Carlos Malespín', '', 6),
+          makeNode('8) Carmen Bolaños Lanuza (2das N.)', null, '', 6),
+          makeNode('9) Marta Bolaños Lanuza (2das N.)', null, '', 6),
+        ]),
+        makeNode('B. Dominga Bolaños Zelaya', 'Bernardo González', '', 5, [
+          makeNode('1) Bernardo José González Bolaños', null, '', 6),
+          makeNode('2) Roger González Bolaños', null, '', 6),
+          makeNode('3) Luis Alberto González Bolaños', null, '', 6),
+          makeNode('4) Ana María González Bolaños', null, '', 6),
+        ]),
+      ]),
+      makeNode('2. Dolores Bolaños Chamorro', 'Diego Manuel Chamorro', 'Hijo de Pedro Joaquín Cuadra Chamorro', 4),
+      makeNode('3. Miguel Bolaños Chamorro', 'Rosa Castillo Arana', 'Sin sucesión', 4),
+      makeNode('4. Mercedes Bolaños Chamorro', null, 'Soltera', 4),
+      makeNode('5. Pastor Bolaños Chamorro', 'Gustavo Alberto Argüello Luge', '', 4, [
+        makeNode('A. Juan Argüello Bolaños', null, 'Soltero', 5),
+        makeNode('B. Julia Argüello Bolaños', null, 'Soltera', 5),
+        makeNode('C. Juana Emelina Argüello Bolaños', 'José Rodolfo Sandino Abau', '', 5, [
+          makeNode('1) Rodolfo Sandino Argüello', 'Janet Matamoros', '', 6),
+          makeNode('2) René Sandino Argüello', 'Berta Monterrey Muñoz', '', 6),
+        ]),
+        makeNode('D. Gustavo Adolfo Argüello Bolaños', 'Carmen Hurtado Cárdenas', '', 5, [
+          makeNode('1) Roberto Argüello Hurtado', null, '', 6),
+          makeNode('2) Álvaro Argüello Hurtado', null, 'Sacerdote', 6),
+          makeNode('3) Silvia Argüello Hurtado', null, '', 6),
+          makeNode('4) María Eugenia Argüello Hurtado', null, '', 6),
+        ]),
+        makeNode('E. Horacio Argüello Bolaños', 'Soledad Wheelock Carazo', '', 5, [
+          makeNode('1) Soledad Argüello Wheelock', 'Rosendo Chamorro Benard', '', 6),
+          makeNode('2) Claudia Argüello Wheelock', 'Roberto Vassalli', '', 6),
+          makeNode('3) María Elena Argüello Wheelock', 'Horacio Vivas Benard', '', 6),
+          makeNode('4) Felipe José Argüello Carazo', 'Lola Carazo Arellano', '', 6),
+        ]),
+        makeNode('F. Felipe José Argüello Carazo', 'María Celeste Dávila', '', 5, [
+          makeNode('a) Ana Isabel Argüello Dávila', null, '', 6),
+          makeNode('b) Álvaro Argüello Dávila', null, '', 6),
+        ]),
+      ]),
+      makeNode('6. Agustín Bolaños Chamorro', 'Elvira Guzmán Bermúdez', 'Sin sucesión', 4),
+    ]),
+    makeNode('II. Josefa Chamorro Avilés', 'Pedro Ramírez', '', 3, [
+      makeNode('1. Blanca Ramírez Chamorro', null, 'Fallecida en la impubertad', 4),
+    ]),
+    makeNode('III. Carlota Chamorro Avilés', 'Luis Castigliolo', 'Sin sucesión', 3),
+    makeNode('IV. Adela Chamorro Avilés', 'Manuel Zavala Bengoechea', '', 3, [
+      makeNode('1. Alejandro Zavala Chamorro', null, 'Soltero', 4),
+      makeNode('2. María Zavala Chamorro', 'Enrique Palazio', '', 4, [
+        makeNode('A. Luis Palazio Zavala', 'Isabel Navas Morales', 'Sin sucesión', 5),
+        makeNode('B. Carlos Palazio Zavala', 'Lucía de Calle', '', 5, [
+          makeNode('1) Rogerio Palazio de Colle', null, '', 6),
+          makeNode('2) Renato Palazio de Colle', null, '', 6),
+        ]),
+        makeNode('C. Margarita Palazio Zavala', 'Angelo Grendi', '', 5, [
+          makeNode('a) Mirella Grendi Palazio', null, '', 6),
+          makeNode('b) Graciela Grendi Palazio', null, '', 6),
+          makeNode('c) María Teresa Grendi Palazio', null, '', 6),
+          makeNode('d) Eduardo Luis Grendi Palazio', null, '', 6),
+        ]),
+        makeNode('D. Matilde Palazio Zavala', 'York Beverly', '', 5, [
+          makeNode('a) Enrique Beverly Palazio', null, '', 6),
+          makeNode('b) Rosa María Beverly Palazio', null, '', 6),
+        ]),
+        makeNode('E. Isolda Palazio Zavala', null, 'Religiosa', 5),
+      ]),
+      makeNode('3. Adela Zavala Chamorro', null, 'Soltera', 4),
+      makeNode('4. Manuel Zavala Chamorro', 'Isabel Argüello Vargas', 'Sin sucesión', 4),
+      makeNode('5. Emilia Zavala Chamorro', null, 'Soltera', 4),
+      makeNode('6. Carlota Zavala Chamorro', null, 'Soltera', 4),
+    ]),
+    makeNode('V. Carmen Chamorro Avilés', null, 'Soltera', 3),
+  ])
+];
+
+// === RAMA SABÁ ===
+// (from file 1009 page 8)
+const sabaData = [
+  makeNode('VI. Sabá Chamorro', 'Pablo Chamorro', 'Hijo de Pablo Chamorro y Margarita Chamorro', 3, [
+    makeNode('1. Rosa Chamorro Chamorro', 'Camilo Barberena Díaz', 'Sin sucesión', 4),
+    makeNode('2. Pablo Chamorro Chamorro', 'María Josefa García Robleto', '', 4, [
+      makeNode('A. Pablo Emilio Chamorro García', null, '', 5, [
+        makeNode('a) Gustavo Chamorro (×Gerardo Barberena)', null, '', 6),
+        makeNode('b) Pedro Chamorro', null, '', 6),
+      ]),
+    ]),
+    makeNode('3. Sara Chamorro Chamorro', null, 'Soltera', 4),
+    makeNode('4. Gustavo Chamorro Chamorro', null, 'Soltero', 4),
+  ]),
+];
+
+// Render all trees
+renderTree(rootData, document.getElementById('tree-root'));
+renderTree(pedroData, document.getElementById('tree-pedro'));
+renderTree(fernandoData, document.getElementById('tree-fernando'));
+renderTree(dionisioData, document.getElementById('tree-dionisio'));
+renderTree(frutoData, document.getElementById('tree-fruto'));
+
+// Add saba section
+const sabaSection = document.createElement('div');
+sabaSection.innerHTML = '<div class="section-header">Rama — Sabá Chamorro (Archivo Nuevo, 1009)</div>';
+document.querySelector('.tree-section').appendChild(sabaSection);
+const sabaContainer = document.createElement('div');
+document.querySelector('.tree-section').appendChild(sabaContainer);
+renderTree(sabaData, sabaContainer);
+</script>
+</body>
+</html>
