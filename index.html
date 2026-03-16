@@ -6,471 +6,473 @@
 <title>Genealogía de la Familia Chamorro</title>
 <link href="https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
 <style>
-/* ─ RESET ─────────────────────────────────────── */
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-html,body{height:100%;overflow:hidden}
+html,body{height:100%}
+body{
+  font-family:'Cormorant Garamond',Georgia,serif;
+  background:#1e1208;
+  color:#1a0f00;
+  overscroll-behavior:none;
+}
 
-/* ─ PALETTE ──────────────────────────────────── */
+/* ── PALETTE ── */
 :root{
   --bark:    #2a1a08;
-  --bark2:   #1a0f00;
   --tan:     #8b6a3a;
   --tan-lt:  #c4a26a;
   --parch:   #f5edd8;
   --parch-d: #efe2c5;
-  --parch-dd:#e8d8b8;
+  --parch-dd:#e0cfa8;
   --faded:   #6b5030;
   --ink:     #1a0f00;
-  --ink-lt:  #3d2b1a;
 }
 
-/* ─ APP SHELL ─────────────────────────────────── */
-body{
-  background:var(--bark);
-  font-family:'Cormorant Garamond',Georgia,serif;
-  color:var(--ink);
-}
+/* ── SHELL ── */
 #app{
-  display:flex;
-  flex-direction:column;
-  height:100vh;
-  max-width:600px;
-  margin:0 auto;
-  background:var(--parch);
+  display:flex;flex-direction:column;
+  height:100vh;max-width:640px;
+  margin:0 auto;background:var(--parch);overflow:hidden;
 }
-@media(min-width:640px){
-  body{display:flex;align-items:center;justify-content:center}
+@media(min-width:660px){
   #app{
-    height:calc(100vh - 3rem);
+    margin:2rem auto;height:calc(100vh - 4rem);
     border:2px solid var(--tan);
-    box-shadow:0 0 0 5px var(--bark),0 0 0 7px var(--tan-lt),0 20px 60px rgba(0,0,0,.5);
+    box-shadow:0 0 0 5px var(--bark),0 0 0 7px var(--tan-lt),0 24px 64px rgba(0,0,0,.6);
   }
 }
 
-/* ─ TOP NAV ───────────────────────────────────── */
-#topnav{
-  display:grid;
-  grid-template-columns:72px 1fr 72px;
-  align-items:center;
-  background:var(--bark);
-  border-bottom:2px solid var(--tan);
-  flex-shrink:0;
-  height:50px;
+/* ── TOPBAR ── */
+#topbar{
+  display:flex;align-items:center;gap:8px;
+  background:var(--bark);border-bottom:2px solid var(--tan);
+  flex-shrink:0;height:52px;padding:0 12px 0 14px;
 }
-#nav-back{
-  display:flex;align-items:center;gap:5px;
-  padding:0 0 0 14px;
-  background:none;border:none;
-  color:var(--tan-lt);
-  font-family:'Cormorant Garamond',serif;
-  font-size:.95rem;cursor:pointer;
-  height:100%;
-  transition:color .15s;
-  opacity:0;pointer-events:none;
-}
-#nav-back.show{opacity:1;pointer-events:auto}
-#nav-back:hover{color:var(--parch)}
-#nav-back svg{width:12px;height:12px;flex-shrink:0}
-#nav-title{
-  text-align:center;
-  font-family:'IM Fell English',serif;
-  font-size:1rem;
-  color:var(--parch-d);
-  overflow:hidden;
-  white-space:nowrap;
-  text-overflow:ellipsis;
-  padding:0 6px;
-}
-#nav-home{
-  display:flex;align-items:center;justify-content:flex-end;
-  padding:0 14px 0 0;
-  background:none;border:none;
-  color:var(--tan-lt);font-size:1.1rem;
-  cursor:pointer;height:100%;
-  transition:color .15s;
-  opacity:0;pointer-events:none;
-}
-#nav-home.show{opacity:1;pointer-events:auto}
-#nav-home:hover{color:var(--parch)}
-
-/* ─ BREADCRUMB ────────────────────────────────── */
-#breadcrumb{
-  display:none;
-  align-items:center;
-  padding:5px 14px;
-  background:var(--parch-d);
-  border-bottom:1px solid var(--parch-dd);
-  overflow-x:auto;
-  scrollbar-width:none;
-  flex-shrink:0;
-  gap:0;
-}
-#breadcrumb::-webkit-scrollbar{display:none}
-#breadcrumb.show{display:flex}
-.bc{
-  font-size:.7rem;color:var(--tan);
-  cursor:pointer;white-space:nowrap;
-  font-style:italic;transition:color .12s;
-  -webkit-tap-highlight-color:transparent;
-}
-.bc:hover{color:var(--ink)}
-.bc.now{color:var(--ink);font-style:normal;font-weight:600;cursor:default}
-.bc-sep{color:var(--tan-lt);margin:0 5px;font-size:.6rem;flex-shrink:0}
-
-/* ─ SCREEN STACK ──────────────────────────────── */
-#screens{flex:1;overflow:hidden;position:relative}
-
-.screen{
-  position:absolute;
-  inset:0;
-  overflow-y:auto;
-  overflow-x:hidden;
-  -webkit-overflow-scrolling:touch;
-  background:var(--parch);
-  /* start off-right; JS adds .on to activate */
-  transform:translateX(100%);
-  transition:transform .25s cubic-bezier(.4,0,.2,1);
-}
-/* active screen */
-.screen.on{transform:translateX(0)}
-/* screen being pushed behind (previous) */
-.screen.behind{transform:translateX(-28%);pointer-events:none}
-
-/* ─ HOME ──────────────────────────────────────── */
-.home-hero{
-  background:var(--bark);
-  padding:2rem 1.4rem 1.5rem;
-  text-align:center;
-  border-bottom:2px solid var(--tan);
-}
-.home-title{
-  font-family:'IM Fell English',serif;
-  font-size:1.65rem;
-  color:var(--parch-d);
-  line-height:1.2;
-  margin-bottom:.3rem;
-}
-.home-sub{
-  font-family:'IM Fell English',serif;
-  font-style:italic;
-  font-size:.82rem;
-  color:var(--tan);
-  letter-spacing:.05em;
-}
-.home-stats{
-  display:flex;justify-content:center;gap:2rem;
-  padding:.9rem 1rem .7rem;
-  background:var(--parch-d);
-  border-bottom:1px solid var(--parch-dd);
-}
-.stat-num{
-  font-family:'IM Fell English',serif;
-  font-size:1.25rem;color:var(--bark2);
-  display:block;
-}
-.stat-lbl{font-size:.65rem;color:var(--faded);text-transform:uppercase;letter-spacing:.08em}
-
-/* ─ LIST SECTION HEADER ───────────────────────── */
-.list-head{
-  padding:11px 16px 5px;
-  font-family:'IM Fell English',serif;
-  font-size:.68rem;
-  letter-spacing:.1em;
-  text-transform:uppercase;
-  color:var(--tan);
-  font-style:italic;
-  background:var(--parch);
-}
-
-/* ─ PERSON CARD ───────────────────────────────── */
-.pcard{
-  display:flex;align-items:center;gap:12px;
-  padding:10px 16px;
-  background:var(--parch);
-  border-bottom:1px solid var(--parch-dd);
-  cursor:pointer;
-  -webkit-tap-highlight-color:transparent;
-  transition:background .1s;
-}
-.pcard:hover,.pcard:active{background:var(--parch-d)}
-
-/* avatar circle */
-.av{
-  width:38px;height:38px;border-radius:50%;
-  display:flex;align-items:center;justify-content:center;
-  font-family:'IM Fell English',serif;
-  font-size:.8rem;font-style:italic;
-  flex-shrink:0;
-  /* color set by gen class on parent */
-}
-/* six generation tones */
-.g0 .av{background:#f0e0c8;color:#7a2e0e}
-.g1 .av{background:#dde8f2;color:#1a3a5c}
-.g2 .av{background:#d6ebd2;color:#2a5018}
-.g3 .av{background:#e6d8f0;color:#481e6a}
-.g4 .av{background:#eae4d0;color:#4a3000}
-.g5 .av{background:#d0e8e6;color:#004040}
-
-.pcard-body{flex:1;min-width:0}
-.pcard-name{
-  font-family:'IM Fell English',serif;
-  font-size:.94rem;color:var(--ink);
-  line-height:1.3;
-}
-.pcard-spouse{
-  font-size:.75rem;color:var(--faded);
-  font-style:italic;margin-top:2px;
+#topbar-title{
+  flex:1;font-family:'IM Fell English',serif;
+  font-size:1rem;color:var(--parch-d);
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
 }
-.pcard-right{
-  display:flex;align-items:center;gap:6px;flex-shrink:0;
+#back-btn{
+  display:none;align-items:center;gap:4px;
+  background:none;border:none;color:var(--tan-lt);
+  font-family:'Cormorant Garamond',serif;font-size:.92rem;
+  cursor:pointer;flex-shrink:0;transition:color .15s;padding:0;
 }
-.badge{
-  font-size:.64rem;color:var(--tan);
-  background:var(--parch-dd);
-  border:1px solid var(--tan-lt);
-  padding:1px 6px;border-radius:10px;
-  white-space:nowrap;
-}
-.chev{color:var(--tan-lt);font-size:.85rem}
+#back-btn.show{display:flex}
+#back-btn:hover{color:var(--parch-d)}
+#back-btn svg{width:11px;height:11px}
 
-/* ─ DETAIL: HERO ──────────────────────────────── */
-.det-hero{
-  background:var(--bark);
-  padding:1.3rem 1.4rem 1.1rem;
-  display:flex;align-items:center;gap:14px;
-  border-bottom:2px solid var(--tan);
-  flex-shrink:0;
+/* ── SEARCH ── */
+#search-wrap{position:relative;flex-shrink:0}
+#search-input{
+  font-family:'Cormorant Garamond',serif;font-size:.9rem;
+  color:var(--ink);background:var(--parch-d);
+  border:1px solid var(--tan);border-radius:20px;
+  padding:5px 28px 5px 28px;width:160px;outline:none;
+  transition:width .2s,border-color .2s;
 }
-.det-av{
-  width:52px;height:52px;border-radius:50%;
+#search-input:focus{width:200px;border-color:var(--tan-lt)}
+#search-input::placeholder{color:var(--faded);font-style:italic}
+.si-icon{
+  position:absolute;left:9px;top:50%;transform:translateY(-50%);
+  color:var(--faded);pointer-events:none;display:flex;
+}
+#si-clear{
+  display:none;position:absolute;right:9px;top:50%;transform:translateY(-50%);
+  background:none;border:none;color:var(--faded);cursor:pointer;
+  font-size:.95rem;line-height:1;padding:0;
+}
+#si-clear.show{display:block}
+#search-results{
+  position:absolute;top:calc(100% + 6px);right:0;
+  width:290px;max-height:340px;overflow-y:auto;
+  background:var(--parch);border:1px solid var(--tan);
+  border-radius:10px;box-shadow:0 8px 28px rgba(0,0,0,.28);
+  z-index:300;display:none;
+}
+#search-results.open{display:block}
+#search-results::-webkit-scrollbar{width:4px}
+#search-results::-webkit-scrollbar-thumb{background:var(--tan-lt);border-radius:2px}
+.sr-row{
+  display:flex;align-items:center;gap:10px;
+  padding:9px 12px;border-bottom:1px solid var(--parch-dd);
+  cursor:pointer;transition:background .1s;
+  -webkit-tap-highlight-color:transparent;
+}
+.sr-row:last-child{border-bottom:none}
+.sr-row:hover,.sr-row:active{background:var(--parch-d)}
+.sr-av{
+  width:30px;height:30px;border-radius:50%;flex-shrink:0;
   display:flex;align-items:center;justify-content:center;
-  font-family:'IM Fell English',serif;
-  font-size:.95rem;font-style:italic;
-  flex-shrink:0;
-  border:1.5px solid var(--tan);
-  /* color set by gen class on .det-hero */
+  font-family:'IM Fell English',serif;font-size:.72rem;font-style:italic;
 }
-/* use same gen tones but target .det-av directly */
-.g0 .det-av{background:#f0e0c8;color:#7a2e0e}
-.g1 .det-av{background:#dde8f2;color:#1a3a5c}
-.g2 .det-av{background:#d6ebd2;color:#2a5018}
-.g3 .det-av{background:#e6d8f0;color:#481e6a}
-.g4 .det-av{background:#eae4d0;color:#4a3000}
-.g5 .det-av{background:#d0e8e6;color:#004040}
+.sr-name{font-family:'IM Fell English',serif;font-size:.86rem;color:var(--ink);line-height:1.3}
+.sr-sub{font-size:.72rem;color:var(--faded);font-style:italic;margin-top:1px}
+.sr-hl{background:rgba(200,150,12,.32);border-radius:2px;padding:0 1px}
+.sr-empty{padding:16px;text-align:center;font-style:italic;font-size:.84rem;color:var(--faded)}
 
-.det-name{
-  font-family:'IM Fell English',serif;
-  font-size:1.1rem;color:var(--parch-d);
-  line-height:1.3;
-}
-.det-spouse{
-  font-size:.8rem;color:var(--tan);
-  font-style:italic;margin-top:3px;
-}
-.det-gen{
-  font-size:.63rem;color:var(--faded);
-  letter-spacing:.08em;text-transform:uppercase;margin-top:4px;
-}
+/* ── SCROLLABLE MAIN ── */
+#main{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;position:relative}
+#main::-webkit-scrollbar{width:4px}
+#main::-webkit-scrollbar-thumb{background:var(--parch-dd);border-radius:2px}
 
-/* ─ DETAIL: FACTS ─────────────────────────────── */
-.fact{
-  display:flex;align-items:flex-start;gap:12px;
-  padding:9px 16px;
+/* ════════════════════════════════════════════════
+   HOME SCREEN
+════════════════════════════════════════════════ */
+#home{
+  display:flex;flex-direction:column;min-height:100%;
+}
+.home-hero{
+  background:var(--bark);padding:2.2rem 1.4rem 1.6rem;
+  text-align:center;border-bottom:2px solid var(--tan);
+}
+.home-title{
+  font-family:'IM Fell English',serif;font-size:1.75rem;
+  color:var(--parch-d);line-height:1.2;margin-bottom:.3rem;
+}
+.home-sub{
+  font-family:'IM Fell English',serif;font-style:italic;
+  font-size:.84rem;color:var(--tan);letter-spacing:.05em;
+}
+.home-stats{
+  display:flex;justify-content:center;gap:2.5rem;
+  padding:.9rem 1rem .7rem;background:var(--parch-d);
   border-bottom:1px solid var(--parch-dd);
 }
-.fact-lbl{
-  font-size:.68rem;color:var(--faded);
-  text-transform:uppercase;letter-spacing:.06em;
-  flex-shrink:0;width:68px;padding-top:1px;
+.stat-n{font-family:'IM Fell English',serif;font-size:1.3rem;color:var(--ink);display:block}
+.stat-l{font-size:.65rem;color:var(--faded);text-transform:uppercase;letter-spacing:.08em}
+.root-label{
+  font-family:'IM Fell English',serif;font-size:.65rem;letter-spacing:.12em;
+  text-transform:uppercase;color:var(--tan);font-style:italic;
+  padding:14px 18px 4px;
 }
-.fact-val{
-  font-size:.86rem;color:var(--ink);
-  line-height:1.4;flex:1;
-}
-.fact-val.tap{
-  color:#7a2e0e;cursor:pointer;
-  text-decoration:underline;
-  text-decoration-color:var(--tan-lt);
-  text-underline-offset:2px;
-}
-.fact-note{
-  padding:9px 16px 11px;
-  font-size:.76rem;color:var(--faded);
-  font-style:italic;
+.root-card{
+  display:flex;align-items:center;gap:12px;
+  padding:11px 16px;background:var(--parch);
   border-bottom:1px solid var(--parch-dd);
-  line-height:1.5;
+  cursor:pointer;transition:background .1s;
+  -webkit-tap-highlight-color:transparent;
 }
-.no-desc{
+.root-card:hover,.root-card:active{background:var(--parch-d)}
+.rc-av{
+  width:40px;height:40px;border-radius:50%;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  font-family:'IM Fell English',serif;font-size:.82rem;font-style:italic;
+}
+.rc-name{font-family:'IM Fell English',serif;font-size:.95rem;color:var(--ink);line-height:1.3}
+.rc-sub{font-size:.76rem;color:var(--faded);font-style:italic;margin-top:2px}
+.rc-right{display:flex;align-items:center;gap:6px;margin-left:auto;flex-shrink:0}
+.rc-badge{
+  font-size:.63rem;color:var(--tan);background:var(--parch-dd);
+  border:1px solid var(--tan-lt);padding:1px 6px;border-radius:10px;
+}
+.rc-chev{color:var(--tan-lt);font-size:.85rem}
+.home-foot{
+  padding:1.2rem 1rem 2rem;text-align:center;font-size:.68rem;
+  color:var(--faded);font-style:italic;line-height:1.7;
+  border-top:1px solid var(--parch-dd);margin-top:.5rem;
+}
+
+/* ════════════════════════════════════════════════
+   FOCUS VIEW — the real Option D
+   Three distinct visual zones stacked vertically
+════════════════════════════════════════════════ */
+#focus{display:none;flex-direction:column;min-height:100%}
+#focus.on{display:flex}
+
+/* ── ZONE CONTAINERS ── */
+.zone{display:flex;flex-direction:column}
+
+/* ── ZONE: ANCESTOR (top, muted) ── */
+.zone-ancestor{
+  background:var(--parch-d);
+  border-bottom:1px solid var(--parch-dd);
+}
+.zone-ancestor-label{
+  font-family:'IM Fell English',serif;font-size:.6rem;
+  letter-spacing:.14em;text-transform:uppercase;
+  color:var(--tan-lt);padding:10px 16px 4px;font-style:italic;
+}
+
+/* ancestor compact row */
+.anc-row{
+  display:flex;align-items:center;gap:10px;
+  padding:8px 16px;cursor:pointer;
+  transition:background .1s;-webkit-tap-highlight-color:transparent;
+  border-bottom:1px solid rgba(224,207,168,.5);
+}
+.anc-row:last-child{border-bottom:none}
+.anc-row:hover,.anc-row:active{background:rgba(224,207,168,.6)}
+.anc-av{
+  width:32px;height:32px;border-radius:50%;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  font-family:'IM Fell English',serif;font-size:.68rem;font-style:italic;
+  opacity:.85;
+}
+.anc-info{flex:1;min-width:0}
+.anc-name{
+  font-family:'IM Fell English',serif;font-size:.84rem;
+  color:var(--faded);line-height:1.25;
+}
+.anc-spouse{font-size:.71rem;color:var(--tan-lt);font-style:italic;margin-top:1px}
+.anc-gen{
+  font-size:.62rem;font-style:italic;color:var(--tan-lt);
+  flex-shrink:0;white-space:nowrap;
+}
+
+/* ── ARROW CONNECTOR between zones ── */
+.zone-arrow{
+  display:flex;align-items:center;justify-content:center;
+  padding:6px 0;background:var(--parch);position:relative;
+}
+.zone-arrow::after{
+  content:'';position:absolute;
+  left:calc(16px + 16px); /* left-pad + half of focused avatar */
+  top:0;bottom:0;width:1px;
+  background:var(--parch-dd);
+  z-index:0;
+}
+
+/* ── ZONE: FOCUSED PERSON (center, prominent) ── */
+.zone-focus{
+  background:var(--parch);
+  border-top:1px solid var(--parch-dd);
+  border-bottom:1px solid var(--parch-dd);
+}
+.zone-focus-label{
+  font-family:'IM Fell English',serif;font-size:.6rem;
+  letter-spacing:.14em;text-transform:uppercase;
+  color:#3a6ea8;padding:10px 16px 4px;font-style:italic;
+}
+.focus-card{
+  display:flex;align-items:center;gap:14px;
+  padding:12px 16px 14px;
+  cursor:pointer;transition:background .1s;
+  -webkit-tap-highlight-color:transparent;
+  border-left:4px solid #3a6ea8;
+  background:#eef4fb;
+}
+.focus-card:hover,.focus-card:active{background:#e4edf7}
+.focus-av{
+  width:52px;height:52px;border-radius:50%;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  font-family:'IM Fell English',serif;font-size:.95rem;font-style:italic;
+  border:2px solid #3a6ea8;
+}
+.focus-name{
+  font-family:'IM Fell English',serif;font-size:1.08rem;
+  color:#1a2f50;line-height:1.3;
+}
+.focus-spouse{
+  font-size:.8rem;color:#4a7aaa;font-style:italic;margin-top:3px;
+}
+.focus-meta{
+  font-size:.65rem;color:#7aa0c8;letter-spacing:.06em;
+  text-transform:uppercase;margin-top:4px;
+}
+.focus-right{display:flex;align-items:center;gap:6px;flex-shrink:0;margin-left:auto}
+.focus-badge{
+  font-size:.64rem;color:#3a6ea8;background:#d0e4f5;
+  border:1px solid #a0c4e8;padding:2px 8px;border-radius:10px;white-space:nowrap;
+}
+.focus-info{font-size:.72rem;color:#7aa0c8;font-style:italic;margin-top:1px}
+
+/* siblings horizontal pills below focus card */
+.sib-wrap{
+  padding:8px 14px 10px;
+  border-top:1px solid #d8e8f5;
+  background:#eef4fb;
+}
+.sib-label{
+  font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;
+  color:#7aa0c8;font-style:italic;margin-bottom:5px;
+}
+.sib-scroll{
+  display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;
+  padding-bottom:2px;
+}
+.sib-scroll::-webkit-scrollbar{display:none}
+.sib-pill{
+  display:flex;align-items:center;gap:5px;
+  padding:4px 10px 4px 6px;flex-shrink:0;
+  border:1px solid #c0d8f0;border-radius:20px;
+  background:#f5f8fb;cursor:pointer;
+  transition:background .1s;-webkit-tap-highlight-color:transparent;
+}
+.sib-pill:hover,.sib-pill:active{background:#e0ecf8;border-color:#a0c4e8}
+.sib-av-sm{
+  width:20px;height:20px;border-radius:50%;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  font-family:'IM Fell English',serif;font-size:.58rem;font-style:italic;
+}
+.sib-text{font-size:.71rem;color:#4a7aaa;font-style:italic;white-space:nowrap}
+
+/* ── ZONE: CHILDREN (bottom) ── */
+.zone-children{background:var(--parch);flex:1}
+.zone-children-label{
+  font-family:'IM Fell English',serif;font-size:.6rem;
+  letter-spacing:.14em;text-transform:uppercase;
+  color:var(--tan);padding:12px 16px 4px;font-style:italic;
+}
+.child-card{
+  display:flex;align-items:center;gap:12px;
+  padding:10px 16px;background:var(--parch);
+  border-bottom:1px solid var(--parch-dd);
+  cursor:pointer;transition:background .1s;
+  -webkit-tap-highlight-color:transparent;
+}
+.child-card:hover,.child-card:active{background:var(--parch-d)}
+.ch-av{
+  width:38px;height:38px;border-radius:50%;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  font-family:'IM Fell English',serif;font-size:.78rem;font-style:italic;
+}
+.ch-name{font-family:'IM Fell English',serif;font-size:.92rem;color:var(--ink);line-height:1.3}
+.ch-spouse{font-size:.75rem;color:var(--faded);font-style:italic;margin-top:2px}
+.ch-right{display:flex;align-items:center;gap:5px;flex-shrink:0;margin-left:auto}
+.ch-badge{
+  font-size:.62rem;color:var(--tan);background:var(--parch-dd);
+  border:1px solid var(--tan-lt);padding:1px 6px;border-radius:10px;white-space:nowrap;
+}
+.ch-chev{color:var(--tan-lt);font-size:.82rem}
+.no-children{
   padding:1.5rem 1rem;text-align:center;
   font-style:italic;font-size:.84rem;color:var(--tan);
 }
 
-/* ─ FOOTER ────────────────────────────────────── */
-.foot{
-  padding:1.4rem 1rem 1.8rem;
-  text-align:center;
-  font-size:.68rem;color:var(--faded);
-  font-style:italic;
-  border-top:1px solid var(--parch-dd);
-  line-height:1.7;
+/* shared gen depth colors via CSS vars */
+.d0{--ab:#f0e0c8;--ac:#7a2e0e}
+.d1{--ab:#dde8f2;--ac:#1a3a5c}
+.d2{--ab:#d6ebd2;--ac:#2a5018}
+.d3{--ab:#e6d8f0;--ac:#481e6a}
+.d4{--ab:#eae4d0;--ac:#4a3000}
+.d5{--ab:#d0e8e6;--ac:#004040}
+.anc-av,.rc-av,.sr-av,.sib-av-sm,.ch-av,.focus-av{
+  background:var(--ab,#efe2c5);color:var(--ac,#6b5030);
 }
 
-/* ─ ANCESTOR SHEET ────────────────────────────── */
-#anc-sheet{
-  position:fixed;
-  inset:0;
-  background:rgba(26,15,0,.6);
-  z-index:200;
-  display:none;
-  align-items:flex-end;
-  justify-content:center;
+/* ── DETAIL SHEET ── */
+#det-overlay{
+  position:fixed;inset:0;background:rgba(26,15,0,.6);
+  z-index:400;display:none;align-items:flex-end;justify-content:center;
 }
-#anc-sheet.open{display:flex}
-.anc-box{
-  background:var(--parch);
-  border-top:2px solid var(--tan);
-  border-radius:16px 16px 0 0;
-  width:100%;max-width:600px;
-  max-height:70vh;
-  display:flex;flex-direction:column;
+#det-overlay.open{display:flex}
+#det-box{
+  background:var(--parch);border-top:2px solid var(--tan);
+  border-radius:16px 16px 0 0;width:100%;max-width:640px;
+  max-height:82vh;display:flex;flex-direction:column;
 }
-.anc-hdr{
-  display:flex;align-items:center;
-  padding:11px 16px 9px;
-  background:var(--parch-d);
-  border-bottom:1px solid var(--parch-dd);
-  border-radius:16px 16px 0 0;
+.det-handle{
+  width:36px;height:4px;border-radius:2px;
+  background:var(--parch-dd);margin:10px auto 2px;flex-shrink:0;
+}
+#det-close{
+  position:absolute;top:12px;right:14px;
+  background:none;border:none;font-size:1.2rem;
+  cursor:pointer;color:var(--tan);padding:2px 6px;line-height:1;
+}
+#det-scroll{overflow-y:auto;flex:1;-webkit-overflow-scrolling:touch;padding-bottom:2rem}
+#det-scroll::-webkit-scrollbar{width:4px}
+#det-scroll::-webkit-scrollbar-thumb{background:var(--tan-lt);border-radius:2px}
+.det-hero{
+  display:flex;align-items:center;gap:14px;
+  padding:14px 16px 12px;border-bottom:1px solid var(--parch-dd);
   flex-shrink:0;
 }
-.anc-hdr-title{
-  font-family:'IM Fell English',serif;
-  font-size:.92rem;color:var(--ink);flex:1;
+.det-av{
+  width:52px;height:52px;border-radius:50%;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  font-family:'IM Fell English',serif;font-size:.95rem;font-style:italic;
+  border:1.5px solid var(--tan-lt);
 }
-.anc-close{
-  background:none;border:none;
-  font-size:1.15rem;cursor:pointer;
-  color:var(--tan);padding:2px 6px;line-height:1;
+.det-name{font-family:'IM Fell English',serif;font-size:1.1rem;color:var(--ink);line-height:1.25}
+.det-spouse{font-size:.8rem;color:var(--faded);font-style:italic;margin-top:3px}
+.det-gen{font-size:.62rem;color:var(--faded);letter-spacing:.08em;text-transform:uppercase;margin-top:4px}
+.det-row{
+  display:flex;align-items:flex-start;gap:10px;
+  padding:9px 16px;border-bottom:1px solid var(--parch-dd);
 }
-.anc-scroll{overflow-y:auto;flex:1;-webkit-overflow-scrolling:touch}
-.anc-row{
-  display:flex;align-items:baseline;gap:10px;
-  padding:10px 16px;border-bottom:1px solid var(--parch-dd);
-  cursor:pointer;transition:background .1s;
-  -webkit-tap-highlight-color:transparent;
+.det-lbl{font-size:.65rem;color:var(--faded);text-transform:uppercase;letter-spacing:.06em;flex-shrink:0;width:72px;padding-top:1px}
+.det-val{font-size:.86rem;color:var(--ink);line-height:1.4;flex:1}
+.det-tap{color:#7a2e0e;cursor:pointer;text-decoration:underline;text-decoration-color:var(--tan-lt);text-underline-offset:2px}
+.det-note{padding:9px 16px 10px;font-size:.76rem;color:var(--faded);font-style:italic;border-bottom:1px solid var(--parch-dd);line-height:1.5}
+.det-section{
+  font-family:'IM Fell English',serif;font-size:.65rem;letter-spacing:.12em;
+  text-transform:uppercase;color:var(--tan);font-style:italic;
+  padding:12px 16px 4px;
 }
-.anc-row:hover,.anc-row:active{background:var(--parch-d)}
-.anc-gen{
-  font-size:.68rem;font-style:italic;
-  color:var(--tan);flex-shrink:0;min-width:40px;text-align:right;
-}
-.anc-name{font-family:'IM Fell English',serif;font-size:.88rem;color:var(--ink)}
-.anc-sp{font-size:.75rem;font-style:italic;color:var(--faded);margin-left:6px}
-.anc-hint{padding:9px 16px;font-size:.7rem;font-style:italic;color:var(--tan);text-align:center}
-.anc-section{
-  padding:7px 16px 4px;
-  font-family:'IM Fell English',serif;
-  font-size:.65rem;
-  letter-spacing:.1em;
-  text-transform:uppercase;
-  color:var(--tan);
-  font-style:italic;
-  background:var(--parch-d);
-  border-bottom:1px solid var(--parch-dd);
-  border-top:1px solid var(--parch-dd);
-}
-.anc-row-self{
+.det-child-row{
   display:flex;align-items:center;gap:10px;
-  padding:11px 16px;
-  background:var(--parch-dd);
-  border-bottom:1px solid var(--parch-dd);
-  border-left:3px solid var(--tan);
-}
-.anc-self-name{
-  font-family:'IM Fell English',serif;
-  font-size:.92rem;color:var(--ink);font-weight:600;
-}
-.anc-self-sp{font-size:.75rem;font-style:italic;color:var(--faded);margin-top:2px}
-.anc-row-desc{
-  display:flex;align-items:baseline;gap:8px;
-  padding:8px 16px;border-bottom:1px solid var(--parch-dd);
+  padding:9px 14px;border-bottom:1px solid var(--parch-dd);
   cursor:pointer;transition:background .1s;
   -webkit-tap-highlight-color:transparent;
 }
-.anc-row-desc:hover,.anc-row-desc:active{background:var(--parch-d)}
-.anc-depth{
-  font-size:.63rem;font-style:italic;
-  color:var(--tan-lt);flex-shrink:0;min-width:40px;text-align:right;
-}
-.anc-desc-name{font-family:'IM Fell English',serif;font-size:.86rem;color:var(--ink-lt)}
-.anc-desc-sp{font-size:.72rem;font-style:italic;color:var(--faded);margin-left:5px}
-.anc-desc-badge{
-  margin-left:auto;font-size:.62rem;color:var(--tan);
-  background:var(--parch-dd);border:1px solid var(--tan-lt);
-  padding:0px 5px;border-radius:8px;flex-shrink:0;white-space:nowrap;
-}
+.det-child-row:hover,.det-child-row:active{background:var(--parch-d)}
 </style>
 </head>
 <body>
 <div id="app">
 
-  <div id="topnav">
-    <button id="nav-back" onclick="goBack()">
-      <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2"
+  <div id="topbar">
+    <button id="back-btn" onclick="goBack()">
+      <svg viewBox="0 0 11 11" fill="none" stroke="currentColor" stroke-width="2"
            stroke-linecap="round" stroke-linejoin="round">
-        <polyline points="8,1 3,6 8,11"/>
+        <polyline points="7,1 2,5.5 7,10"/>
       </svg>
       Atrás
     </button>
-    <div id="nav-title">Familia Chamorro</div>
-    <button id="nav-home" onclick="goHome()">⌂</button>
+    <div id="topbar-title">Familia Chamorro</div>
+    <div id="search-wrap">
+      <span class="si-icon">
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor"
+             stroke-width="1.6" stroke-linecap="round">
+          <circle cx="5" cy="5" r="3.8"/>
+          <line x1="8" y1="8" x2="11.2" y2="11.2"/>
+        </svg>
+      </span>
+      <input id="search-input" type="text" placeholder="Buscar…"
+             oninput="onSearch(this.value)" autocomplete="off" spellcheck="false">
+      <button id="si-clear" onclick="clearSearch()">×</button>
+      <div id="search-results"></div>
+    </div>
   </div>
 
-  <div id="breadcrumb"></div>
+  <div id="main">
 
-  <div id="screens">
-    <div class="screen on" id="s-home">
+    <!-- HOME -->
+    <div id="home">
       <div class="home-hero">
         <div class="home-title">Genealogía de la<br>Familia Chamorro</div>
         <div class="home-sub">De Sevilla, España — Nicaragua &amp; Guatemala</div>
       </div>
       <div class="home-stats">
-        <div><span class="stat-num" id="stat-n">—</span><span class="stat-lbl">Personas</span></div>
-        <div><span class="stat-num">10</span><span class="stat-lbl">Generaciones</span></div>
-        <div><span class="stat-num">1632</span><span class="stat-lbl">Desde</span></div>
+        <div><span class="stat-n" id="stat-n">—</span><span class="stat-l">Personas</span></div>
+        <div><span class="stat-n">10</span><span class="stat-l">Generaciones</span></div>
+        <div><span class="stat-n">1632</span><span class="stat-l">Desde</span></div>
       </div>
-      <div id="home-list"></div>
-      <div class="foot">
+      <div class="root-label">Tronco del árbol — toca para explorar</div>
+      <div id="root-list"></div>
+      <div class="home-foot">
         Fuentes: <em>Genealogía Chamorro de Sotomayor</em> por Edgar Juan Aparicio y Aparicio,
         Marqués de Vistabella; y compilación de Pedro Pablo Vivas Benard.
         Sólo se incluye información presente en las fuentes originales.
       </div>
     </div>
 
-    <div class="screen" id="s-detail">
-      <div id="det-hero" class="det-hero">
-        <div id="det-av" class="det-av"></div>
-        <div>
-          <div id="det-name" class="det-name"></div>
-          <div id="det-spouse" class="det-spouse"></div>
-          <div id="det-gen" class="det-gen"></div>
-        </div>
-      </div>
-      <div id="det-facts"></div>
-      <div id="det-kids"></div>
+    <!-- FOCUS VIEW -->
+    <div id="focus">
+      <!-- rendered by JS -->
     </div>
-  </div>
 
+  </div>
 </div>
 
-<!-- ANCESTOR SHEET -->
-<div id="anc-sheet" onclick="closeAnc(event)">
-  <div class="anc-box">
-    <div class="anc-hdr">
-      <span class="anc-hdr-title">Línea genealógica completa</span>
-      <button class="anc-close" onclick="closeAnc()">×</button>
-    </div>
-    <div class="anc-scroll" id="anc-scroll"></div>
+<!-- DETAIL SHEET -->
+<div id="det-overlay" onclick="closeDet(event)">
+  <div id="det-box">
+    <div class="det-handle"></div>
+    <button id="det-close" onclick="closeDet()">×</button>
+    <div id="det-scroll"></div>
   </div>
 </div>
 
@@ -2042,324 +2044,330 @@ function buildFrutoChamorro() {
 }
 
 </script>
-
 <script>
-// ─────────────────────────────────────────────────────────────────────
-// BOOT: index every node once, pre-compute descendant counts
-// ─────────────────────────────────────────────────────────────────────
-const IDX    = {};   // id → node
-const PARENT = {};   // id → parentId
-const DEPTH  = {};   // id → depth
-const DCOUNT = {};   // id → total descendant count (pre-computed)
+// ═══════════════════════════════════
+// INDEX
+// ═══════════════════════════════════
+const IDX={}, PAR={}, DEP={}, DC={};
 
-(function index(nodes, pid, d) {
-  for (const n of nodes) {
-    IDX[n.id] = n;
-    DEPTH[n.id] = d;
-    if (pid) PARENT[n.id] = pid;
-    if (n.children && n.children.length) index(n.children, n.id, d + 1);
+(function idx(nodes,pid,d){
+  for(const n of nodes){
+    IDX[n.id]=n; DEP[n.id]=d;
+    if(pid) PAR[n.id]=pid;
+    if(n.children&&n.children.length) idx(n.children,n.id,d+1);
   }
-})(data, null, 0);
+})(data,null,0);
 
-// pre-compute descendant counts bottom-up so renderCard is O(1)
-(function computeCounts(nodes) {
-  for (const n of nodes) {
-    if (n.children && n.children.length) {
-      computeCounts(n.children);
-      DCOUNT[n.id] = n.children.reduce((s, c) => s + 1 + (DCOUNT[c.id] || 0), 0);
-    } else {
-      DCOUNT[n.id] = 0;
-    }
+(function dc(nodes){
+  for(const n of nodes){
+    if(n.children&&n.children.length){
+      dc(n.children);
+      DC[n.id]=n.children.reduce((s,c)=>s+1+(DC[c.id]||0),0);
+    } else DC[n.id]=0;
   }
 })(data);
 
-document.getElementById('stat-n').textContent = Object.keys(IDX).length.toLocaleString();
+document.getElementById('stat-n').textContent=Object.keys(IDX).length.toLocaleString();
 
-// ─────────────────────────────────────────────────────────────────────
+// ═══════════════════════════════════
 // HELPERS
-// ─────────────────────────────────────────────────────────────────────
-function esc(s) {
-  return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+// ═══════════════════════════════════
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;')}
+function ini(name){
+  const caps=name.split(' ').filter(w=>w.length>2&&w[0]===w[0].toUpperCase()&&!/^(de|del|y|von|van|la|el|don|doña|fray|br)$/i.test(w));
+  return caps.length>=2?caps[0][0]+caps[1][0]:caps.length===1?caps[0].slice(0,2):name.slice(0,2).toUpperCase();
+}
+function dc_class(id){return 'd'+((DEP[id]||0)%6)}
+function short(name){return name.replace(/^(Don|Doña|Fray|Br\.?|Dr\.?|Tte\.?)\s+/i,'').split(' ').slice(0,3).join(' ')}
+function lname(n){return(n.label?n.label+'. ':'')+n.name}
+function ancs(id){const c=[];let cur=id;while(PAR[cur]){cur=PAR[cur];c.unshift(cur);}return c;}
+
+// ═══════════════════════════════════
+// NAVIGATION
+// ═══════════════════════════════════
+let CUR=null, HIST=[];
+
+function focusOn(id,push=true){
+  if(!IDX[id]) return;
+  closeSearch();
+  if(push&&CUR&&CUR!==id) HIST.push(CUR);
+  CUR=id;
+  document.getElementById('home').style.display='none';
+  document.getElementById('focus').classList.add('on');
+  const bb=document.getElementById('back-btn');
+  if(HIST.length>0) bb.classList.add('show'); else bb.classList.remove('show');
+  document.getElementById('topbar-title').textContent=short(IDX[id].name);
+  renderFocus(id);
+  document.getElementById('main').scrollTop=0;
 }
 
-function initials(name) {
-  const words = name.split(' ');
-  // pick up to 2 capitalised words longer than 2 chars
-  const caps = words.filter(w => w.length > 2 && w[0] === w[0].toUpperCase() && !/^(de|del|y|von|van|la|el)$/i.test(w));
-  if (caps.length >= 2) return caps[0][0] + caps[1][0];
-  if (caps.length === 1) return caps[0].slice(0, 2);
-  return name.slice(0, 2).toUpperCase();
+function goBack(){
+  if(!HIST.length) return;
+  focusOn(HIST.pop(),false);
 }
 
-function gClass(id) { return 'g' + (DEPTH[id] % 6); }
-
-function ancestors(id) {
-  const chain = [];
-  let cur = id;
-  while (PARENT[cur]) { cur = PARENT[cur]; chain.unshift(cur); }
-  return chain;
-}
-
-// ─────────────────────────────────────────────────────────────────────
-// RENDER: person card
-// ─────────────────────────────────────────────────────────────────────
-function cardHTML(node) {
-  const gc = gClass(node.id);
-  const ini = esc(initials(node.name));
-  const lbl = node.label ? esc(node.label) + '. ' : '';
-  const dc = DCOUNT[node.id] || 0;
-  const badge = dc > 0 ? `<span class="badge">${dc} desc.</span>` : '';
-  const chev = (node.children && node.children.length) ? '<span class="chev">›</span>' : '';
-  return `<div class="pcard ${gc}" onclick="open_('${esc(node.id)}')">
-  <div class="av">${ini}</div>
-  <div class="pcard-body">
-    <div class="pcard-name">${lbl}${esc(node.name)}</div>
-    ${node.spouse ? `<div class="pcard-spouse">× ${esc(node.spouse)}</div>` : ''}
-  </div>
-  <div class="pcard-right">${badge}${chev}</div>
-</div>`;
-}
-
-// ─────────────────────────────────────────────────────────────────────
+// ═══════════════════════════════════
 // HOME
-// ─────────────────────────────────────────────────────────────────────
-(function renderHome() {
-  let html = '<div class="list-head">Tronco del árbol — toca para explorar</div>';
-  for (const n of data) html += cardHTML(n);
-  document.getElementById('home-list').innerHTML = html;
+// ═══════════════════════════════════
+(function renderHome(){
+  let h='';
+  for(const n of data){
+    const d=dc_class(n.id);
+    const dc=DC[n.id]||0;
+    h+=`<div class="root-card ${d}" onclick="focusOn('${esc(n.id)}')">
+      <div class="rc-av">${esc(ini(n.name))}</div>
+      <div style="flex:1;min-width:0">
+        <div class="rc-name">${esc(lname(n))}</div>
+        ${n.spouse?`<div class="rc-sub">× ${esc(n.spouse)}</div>`:''}
+      </div>
+      <div class="rc-right">
+        ${dc>0?`<span class="rc-badge">${dc.toLocaleString()} desc.</span>`:''}
+        <span class="rc-chev">›</span>
+      </div>
+    </div>`;
+  }
+  document.getElementById('root-list').innerHTML=h;
 })();
 
-// ─────────────────────────────────────────────────────────────────────
-// DETAIL
-// ─────────────────────────────────────────────────────────────────────
-function renderDetail(id) {
-  const n = IDX[id];
-  if (!n) return;
+// ═══════════════════════════════════
+// FOCUS VIEW — Option D layout
+// ═══════════════════════════════════
+function renderFocus(id){
+  const node=IDX[id];
+  const ancestors=ancs(id).map(aid=>IDX[aid]).filter(Boolean);
+  const par=ancestors.length?ancestors[ancestors.length-1]:null;
+  const siblings=par?(par.children||[]).filter(c=>c.id!==id):[];
+  const children=node.children||[];
+  const depth=DEP[id]||0;
 
-  const gc = gClass(id);
-  const hero = document.getElementById('det-hero');
-  hero.className = 'det-hero ' + gc;
-  document.getElementById('det-av').textContent = initials(n.name);
-  document.getElementById('det-name').textContent = (n.label ? n.label + '. ' : '') + n.name;
-  document.getElementById('det-spouse').textContent = n.spouse ? '× ' + n.spouse : '';
-  document.getElementById('det-gen').textContent = DEPTH[id] > 0 ? 'Generación ' + (DEPTH[id] + 1) : 'Raíz del árbol';
+  let h='';
 
-  // facts
-  const ancs = ancestors(id);
-  const par = ancs.length ? IDX[ancs[ancs.length - 1]] : null;
-  const dc = DCOUNT[id] || 0;
-  let facts = '';
-
-  if (par) {
-    const pLabel = (par.label ? par.label + '. ' : '') + par.name;
-    facts += `<div class="fact">
-      <span class="fact-lbl">Padre/Madre</span>
-      <span class="fact-val tap" onclick="open_('${esc(par.id)}')">${esc(pLabel)}</span>
-    </div>`;
-  }
-  if (ancs.length > 1) {
-    facts += `<div class="fact">
-      <span class="fact-lbl">Ancestros</span>
-      <span class="fact-val tap" onclick="openAnc('${esc(id)}')">${ancs.length} generaciones ↑ · Ver línea completa</span>
-    </div>`;
-  }
-  if (dc > 0) {
-    facts += `<div class="fact">
-      <span class="fact-lbl">Descendencia</span>
-      <span class="fact-val">${dc.toLocaleString()} personas</span>
-    </div>`;
-  }
-  if (n.note) {
-    facts += `<div class="fact-note">${esc(n.note)}</div>`;
-  }
-  document.getElementById('det-facts').innerHTML = facts;
-
-  // children
-  let kids = '';
-  if (n.children && n.children.length) {
-    kids += `<div class="list-head">${n.children.length} hijo${n.children.length !== 1 ? 's' : ''}</div>`;
-    for (const c of n.children) kids += cardHTML(c);
-  } else {
-    kids = '<div class="no-desc">Sin descendencia registrada en las fuentes.</div>';
-  }
-  document.getElementById('det-kids').innerHTML = kids;
-  document.getElementById('s-detail').scrollTop = 0;
-}
-
-// ─────────────────────────────────────────────────────────────────────
-// NAVIGATION STACK
-// ─────────────────────────────────────────────────────────────────────
-const sHome   = document.getElementById('s-home');
-const sDetail = document.getElementById('s-detail');
-let stack = [];  // array of ids; empty = home
-
-function updateNav() {
-  const back  = document.getElementById('nav-back');
-  const home  = document.getElementById('nav-home');
-  const title = document.getElementById('nav-title');
-  const bc    = document.getElementById('breadcrumb');
-
-  if (!stack.length) {
-    back.classList.remove('show');
-    home.classList.remove('show');
-    title.textContent = 'Familia Chamorro';
-    bc.classList.remove('show');
-    bc.innerHTML = '';
-    return;
-  }
-
-  back.classList.add('show');
-  const cur = IDX[stack[stack.length - 1]];
-  title.textContent = cur ? cur.name.split(' ').slice(0, 3).join(' ') : '';
-
-  if (stack.length > 1) home.classList.add('show');
-  else home.classList.remove('show');
-
-  // breadcrumb
-  bc.classList.add('show');
-  let bcHtml = `<span class="bc" onclick="goHome()">Inicio</span>`;
-  stack.forEach((id, i) => {
-    const nd = IDX[id];
-    if (!nd) return;
-    const short = nd.name.split(' ').slice(0, 2).join(' ');
-    bcHtml += `<span class="bc-sep">›</span>`;
-    if (i < stack.length - 1) {
-      bcHtml += `<span class="bc" onclick="jumpTo(${i})">${esc(short)}</span>`;
-    } else {
-      bcHtml += `<span class="bc now">${esc(short)}</span>`;
-    }
-  });
-  bc.innerHTML = bcHtml;
-  bc.scrollLeft = bc.scrollWidth;
-}
-
-function open_(id) {
-  if (!IDX[id]) return;
-  renderDetail(id);
-  stack.push(id);
-
-  // home goes behind, detail comes forward
-  sHome.classList.add('behind');
-  sDetail.classList.remove('behind');
-  sDetail.classList.add('on');
-
-  updateNav();
-}
-
-function goBack() {
-  if (!stack.length) return;
-  stack.pop();
-
-  if (!stack.length) {
-    // return to home
-    sDetail.classList.remove('on');
-    sDetail.classList.add('behind');
-    sHome.classList.remove('behind');
-  } else {
-    // go to previous in stack
-    renderDetail(stack[stack.length - 1]);
-    document.getElementById('s-detail').scrollTop = 0;
-  }
-  updateNav();
-}
-
-function goHome() {
-  stack = [];
-  sDetail.classList.remove('on');
-  sDetail.classList.add('behind');
-  sHome.classList.remove('behind');
-  updateNav();
-}
-
-function jumpTo(i) {
-  stack = stack.slice(0, i + 1);
-  renderDetail(stack[stack.length - 1]);
-  sHome.classList.add('behind');
-  sDetail.classList.add('on');
-  updateNav();
-}
-
-// ─────────────────────────────────────────────────────────────────────
-// LINEAGE SHEET — ancestors above, selected person, descendants below
-// ─────────────────────────────────────────────────────────────────────
-function openAnc(id) {
-  const node = IDX[id];
-  if (!node) return;
-
-  // ── ancestors (oldest first) ──────────────────────────────────────
-  const ancs = ancestors(id).map(aid => IDX[aid]).filter(Boolean);
-  let html = '';
-
-  if (ancs.length) {
-    html += '<div class="anc-section">Ancestros</div>';
-    ancs.forEach((a, i) => {
-      const sp = a.spouse ? `<span class="anc-sp">× ${esc(a.spouse)}</span>` : '';
-      html += `<div class="anc-row" onclick="open_('${esc(a.id)}');closeAnc()">
-        <span class="anc-gen">Gen. ${i + 1}</span>
-        <span class="anc-name">${esc((a.label ? a.label + '. ' : '') + a.name)}${sp}</span>
+  // ── ZONE 1: ancestors (muted, compact) ──────────────────────
+  if(ancestors.length){
+    h+=`<div class="zone zone-ancestor">
+      <div class="zone-ancestor-label">Ascendencia — ${ancestors.length} generación${ancestors.length!==1?'es':''}</div>`;
+    ancestors.forEach((a,i)=>{
+      const d=dc_class(a.id);
+      h+=`<div class="anc-row ${d}" onclick="focusOn('${esc(a.id)}')">
+        <div class="anc-av">${esc(ini(a.name))}</div>
+        <div class="anc-info">
+          <div class="anc-name">${esc(lname(a))}</div>
+          ${a.spouse?`<div class="anc-spouse">× ${esc(a.spouse)}</div>`:''}
+        </div>
+        <span class="anc-gen">Gen. ${i+1}</span>
       </div>`;
     });
+    h+=`</div>`;
   }
 
-  // ── selected person ───────────────────────────────────────────────
-  html += '<div class="anc-section">Persona seleccionada</div>';
-  html += `<div class="anc-row-self">
+  // ── ZONE 2: focused person (prominent card) ──────────────────
+  const dc_n=DC[id]||0;
+  h+=`<div class="zone zone-focus">
+    <div class="zone-focus-label">Persona seleccionada · Gen. ${depth+1}</div>
+    <div class="focus-card ${dc_class(id)}" onclick="openDet('${esc(id)}')">
+      <div class="focus-av">${esc(ini(node.name))}</div>
+      <div style="flex:1;min-width:0">
+        <div class="focus-name">${esc(lname(node))}</div>
+        ${node.spouse?`<div class="focus-spouse">× ${esc(node.spouse)}</div>`:''}
+        <div class="focus-meta">Toca para más detalles</div>
+      </div>
+      <div class="focus-right">
+        ${dc_n>0?`<span class="focus-badge">${dc_n.toLocaleString()} desc.</span>`:''}
+      </div>
+    </div>`;
+
+  // siblings strip
+  if(siblings.length){
+    h+=`<div class="sib-wrap">
+      <div class="sib-label">Hermanos (${siblings.length})</div>
+      <div class="sib-scroll">`;
+    siblings.slice(0,16).forEach(s=>{
+      const sd=dc_class(s.id);
+      h+=`<div class="sib-pill ${sd}" onclick="focusOn('${esc(s.id)}')">
+        <div class="sib-av-sm">${esc(ini(s.name))}</div>
+        <span class="sib-text">${esc(short(s.name))}</span>
+      </div>`;
+    });
+    if(siblings.length>16) h+=`<div class="sib-pill"><span class="sib-text">+${siblings.length-16} más</span></div>`;
+    h+=`</div></div>`;
+  }
+  h+=`</div>`;
+
+  // ── ZONE 3: children (full cards) ───────────────────────────
+  h+=`<div class="zone zone-children">`;
+  if(children.length){
+    h+=`<div class="zone-children-label">Hijos — ${children.length}</div>`;
+    for(const ch of children){
+      const cd=dc_class(ch.id);
+      const cdc=DC[ch.id]||0;
+      h+=`<div class="child-card ${cd}" onclick="focusOn('${esc(ch.id)}')">
+        <div class="ch-av">${esc(ini(ch.name))}</div>
+        <div style="flex:1;min-width:0">
+          <div class="ch-name">${esc(lname(ch))}</div>
+          ${ch.spouse?`<div class="ch-spouse">× ${esc(ch.spouse)}</div>`:''}
+        </div>
+        <div class="ch-right">
+          ${cdc>0?`<span class="ch-badge">${cdc.toLocaleString()} desc.</span>`:''}
+          ${(ch.children&&ch.children.length)?`<span class="ch-chev">›</span>`:''}
+        </div>
+      </div>`;
+    }
+  } else {
+    h+=`<div class="no-children">Sin descendencia registrada en las fuentes.</div>`;
+  }
+  h+=`</div>`;
+
+  document.getElementById('focus').innerHTML=h;
+}
+
+// ═══════════════════════════════════
+// DETAIL SHEET
+// ═══════════════════════════════════
+function openDet(id){
+  const n=IDX[id]; if(!n) return;
+  const d=dc_class(id);
+  const ancestors=ancs(id);
+  const par=ancestors.length?IDX[ancestors[ancestors.length-1]]:null;
+  const total=DC[id]||0;
+
+  let h=`<div class="det-hero ${d}">
+    <div class="det-av">${esc(ini(n.name))}</div>
     <div>
-      <div class="anc-self-name">${esc((node.label ? node.label + '. ' : '') + node.name)}</div>
-      ${node.spouse ? `<div class="anc-self-sp">× ${esc(node.spouse)}</div>` : ''}
+      <div class="det-name">${esc(lname(n))}</div>
+      ${n.spouse?`<div class="det-spouse">× ${esc(n.spouse)}</div>`:''}
+      <div class="det-gen">Generación ${(DEP[id]||0)+1}</div>
     </div>
   </div>`;
 
-  // ── descendants (up to 4 levels deep) ────────────────────────────
-  const dc = DCOUNT[id] || 0;
-  if (dc > 0) {
-    html += `<div class="anc-section">Descendencia — ${dc.toLocaleString()} personas</div>`;
-    html += renderDescTree(node, 0, 4);
-  }
-
-  html += '<div class="anc-hint">Toca cualquier nombre para navegar a esa persona</div>';
-  document.getElementById('anc-scroll').innerHTML = html;
-
-  // scroll to the selected person card
-  requestAnimationFrame(() => {
-    const self = document.querySelector('.anc-row-self');
-    if (self) self.scrollIntoView({ block: 'center' });
-  });
-
-  document.getElementById('anc-sheet').classList.add('open');
-}
-
-// Render descendants recursively as flat rows with depth indent
-function renderDescTree(node, depth, maxDepth) {
-  if (!node.children || !node.children.length) return '';
-  let out = '';
-  for (const child of node.children) {
-    const indent = '│  '.repeat(depth) + '├─ ';
-    const dc = DCOUNT[child.id] || 0;
-    const badge = dc > 0 ? `<span class="anc-desc-badge">${dc} desc.</span>` : '';
-    const sp = child.spouse ? `<span class="anc-desc-sp">× ${esc(child.spouse)}</span>` : '';
-    const lbl = child.label ? esc(child.label) + '. ' : '';
-    out += `<div class="anc-row-desc" onclick="open_('${esc(child.id)}');closeAnc()">
-      <span class="anc-depth" style="font-family:monospace;white-space:pre">${esc(indent)}</span>
-      <span class="anc-desc-name">${lbl}${esc(child.name)}${sp}</span>
-      ${badge}
+  if(par){
+    h+=`<div class="det-row">
+      <span class="det-lbl">Padre/Madre</span>
+      <span class="det-val det-tap" onclick="closeDet();focusOn('${esc(par.id)}')">${esc(lname(par))}</span>
     </div>`;
-    if (depth < maxDepth) {
-      out += renderDescTree(child, depth + 1, maxDepth);
-    } else if (child.children && child.children.length) {
-      out += `<div class="anc-row-desc" style="opacity:.5;pointer-events:none">
-        <span class="anc-depth" style="font-family:monospace;white-space:pre">${esc('│  '.repeat(depth + 1) + '└─ ')}</span>
-        <span class="anc-desc-name" style="font-style:italic">${child.children.length} ramas más…</span>
+  }
+  if(ancestors.length>1){
+    h+=`<div class="det-row">
+      <span class="det-lbl">Ancestros</span>
+      <span class="det-val">${ancestors.length} generaciones desde Sevilla</span>
+    </div>`;
+  }
+  if(total>0){
+    h+=`<div class="det-row">
+      <span class="det-lbl">Descendencia</span>
+      <span class="det-val">${total.toLocaleString()} personas en total</span>
+    </div>`;
+  }
+  if(n.note) h+=`<div class="det-note">${esc(n.note)}</div>`;
+
+  const kids=n.children||[];
+  if(kids.length){
+    h+=`<div class="det-section">Hijos (${kids.length})</div>`;
+    for(const c of kids){
+      const cd=dc_class(c.id);
+      const cdc=DC[c.id]||0;
+      h+=`<div class="det-child-row ${cd}" onclick="closeDet();focusOn('${esc(c.id)}')">
+        <div class="anc-av" style="width:30px;height:30px;font-size:.68rem">${esc(ini(c.name))}</div>
+        <div style="flex:1;min-width:0">
+          <div style="font-family:'IM Fell English',serif;font-size:.88rem;color:var(--ink)">${esc(lname(c))}</div>
+          ${c.spouse?`<div style="font-size:.73rem;color:var(--faded);font-style:italic">× ${esc(c.spouse)}</div>`:''}
+        </div>
+        ${cdc>0?`<span class="rc-badge">${cdc.toLocaleString()} desc.</span>`:''}
       </div>`;
     }
   }
-  return out;
+
+  document.getElementById('det-scroll').innerHTML=h;
+  document.getElementById('det-overlay').classList.add('open');
 }
 
-function closeAnc(e) {
-  if (e && e.target !== document.getElementById('anc-sheet')) return;
-  document.getElementById('anc-sheet').classList.remove('open');
+function closeDet(e){
+  if(e&&e.target!==document.getElementById('det-overlay')) return;
+  document.getElementById('det-overlay').classList.remove('open');
 }
+
+// ═══════════════════════════════════
+// SEARCH
+// ═══════════════════════════════════
+let stimer=null;
+
+function onSearch(q){
+  document.getElementById('si-clear').classList.toggle('show',q.length>0);
+  clearTimeout(stimer);
+  if(!q.trim()){closeSearch();return;}
+  stimer=setTimeout(()=>runSearch(q.trim()),150);
+}
+
+// normalize: strip accents + lowercase so "jose" matches "José", "n" matches "ñ"
+function norm(s){
+  return String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
+}
+
+// pre-build normalized search strings once per node (populated on first search)
+const NORM={};
+function normNode(n){
+  if(!NORM[n.id]) NORM[n.id]=norm(n.name)+' '+(n.spouse?norm(n.spouse):'');
+  return NORM[n.id];
+}
+
+function runSearch(q){
+  const lo=norm(q);
+  const res=[];
+  for(const id in IDX){
+    const n=IDX[id];
+    if(normNode(n).includes(lo)){
+      res.push(n);
+      if(res.length>=40) break;
+    }
+  }
+  const box=document.getElementById('search-results');
+  if(!res.length){
+    box.innerHTML=`<div class="sr-empty">Sin resultados para «${esc(q)}»</div>`;
+    box.classList.add('open'); return;
+  }
+  // highlight: match on normalized but show original text
+  function hl(original){
+    const normOrig=norm(original);
+    let out='', i=0;
+    while(i<original.length){
+      const slice=normOrig.slice(i,i+lo.length);
+      if(slice===lo){
+        out+=`<span class="sr-hl">${esc(original.slice(i,i+lo.length))}</span>`;
+        i+=lo.length;
+      } else {
+        out+=esc(original[i++]);
+      }
+    }
+    return out;
+  }
+  let h='';
+  for(const n of res){
+    const d=dc_class(n.id);
+    h+=`<div class="sr-row ${d}" onclick="clearSearch();focusOn('${esc(n.id)}')">
+      <div class="sr-av">${esc(ini(n.name))}</div>
+      <div>
+        <div class="sr-name">${hl(n.name)}</div>
+        ${n.spouse?`<div class="sr-sub">× ${hl(n.spouse)}</div>`:''}
+      </div>
+    </div>`;
+  }
+  box.innerHTML=h;
+  box.classList.add('open');
+}
+
+function closeSearch(){document.getElementById('search-results').classList.remove('open')}
+function clearSearch(){
+  const i=document.getElementById('search-input');
+  i.value='';
+  document.getElementById('si-clear').classList.remove('show');
+  closeSearch();i.focus();
+}
+
+document.addEventListener('click',e=>{
+  if(!document.getElementById('search-wrap').contains(e.target)) closeSearch();
+});
+document.getElementById('search-input').addEventListener('keydown',e=>{
+  if(e.key==='Escape') clearSearch();
+});
 </script>
 </body>
 </html>
